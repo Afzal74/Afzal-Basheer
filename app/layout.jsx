@@ -1,0 +1,24 @@
+import './globals.css'
+import { AudioProvider } from '@/components/AudioProvider'
+import MusicButton from '@/components/MusicButton'
+
+export const metadata = {
+  title: 'Afzal Basheer',
+  description: 'Creative engineer specializing in high-fidelity interaction and gaming-inspired motion systems.',
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+      </head>
+      <body>
+        <AudioProvider>
+          {children}
+          <MusicButton />
+        </AudioProvider>
+      </body>
+    </html>
+  )
+}

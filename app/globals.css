@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* Marquee Animation */
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-box {
+  display: flex;
+  animation: marquee 25s linear infinite;
+  width: max-content;
+}
+
+.marquee-item {
+  padding: 0 2rem;
+}
+
+.marquee-item img {
+  height: 60px;
+  width: auto;
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.marquee-item img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Gradient edges for marquee */
+.gradient-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.gradient-edge:first-child {
+  left: 0;
+  background: linear-gradient(to right, #050505, transparent);
+}
+
+.gradient-edge:nth-child(2) {
+  right: 0;
+  background: linear-gradient(to left, #050505, transparent);
+}
+
+/* Hero badge */
+.hero-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+/* Section padding */
+.section-padding {
+  padding: 5rem 0;
+}
