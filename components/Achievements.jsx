@@ -64,6 +64,34 @@ const Achievements = () => {
       gsap.set(".achievements-header", { opacity: 1, y: 0 });
       gsap.set(".achievement-card", { opacity: 1, x: 0 });
       gsap.set(".achievement-preview", { opacity: 1, scale: 1 });
+      // Still run border animations
+      gsap.to(".achievement-border-top", {
+        left: "100%",
+        duration: 3,
+        repeat: -1,
+        ease: "none",
+      });
+      gsap.to(".achievement-border-right", {
+        top: "100%",
+        duration: 3,
+        repeat: -1,
+        ease: "none",
+        delay: 0.75,
+      });
+      gsap.to(".achievement-border-bottom", {
+        right: "100%",
+        duration: 3,
+        repeat: -1,
+        ease: "none",
+        delay: 1.5,
+      });
+      gsap.to(".achievement-border-left", {
+        bottom: "100%",
+        duration: 3,
+        repeat: -1,
+        ease: "none",
+        delay: 2.25,
+      });
       return;
     }
 
@@ -96,6 +124,35 @@ const Achievements = () => {
 
       sessionStorage.setItem("achievementsAnimated", "true");
     }, containerRef);
+
+    // Red border animation - outside context
+    gsap.to(".achievement-border-top", {
+      left: "100%",
+      duration: 3,
+      repeat: -1,
+      ease: "none",
+    });
+    gsap.to(".achievement-border-right", {
+      top: "100%",
+      duration: 3,
+      repeat: -1,
+      ease: "none",
+      delay: 0.75,
+    });
+    gsap.to(".achievement-border-bottom", {
+      right: "100%",
+      duration: 3,
+      repeat: -1,
+      ease: "none",
+      delay: 1.5,
+    });
+    gsap.to(".achievement-border-left", {
+      bottom: "100%",
+      duration: 3,
+      repeat: -1,
+      ease: "none",
+      delay: 2.25,
+    });
 
     return () => ctx.revert();
   }, [mounted]);
@@ -152,8 +209,8 @@ const Achievements = () => {
               style={pixelFont}
               className="text-zinc-600 text-[8px] md:text-[10px] tracking-widest mb-2 md:mb-4 uppercase flex items-center gap-2"
             >
-              <Trophy size={12} className="md:w-[14px] md:h-[14px]" /> Trophy_Cabinet / {achievements.length}{" "}
-              Unlocked
+              <Trophy size={12} className="md:w-[14px] md:h-[14px]" />{" "}
+              Trophy_Cabinet / {achievements.length} Unlocked
             </div>
             <h2
               style={appleFont}
@@ -164,13 +221,19 @@ const Achievements = () => {
           </div>
 
           <div className="flex flex-col lg:flex-row-reverse gap-6 md:gap-12 items-start">
-            {/* Achievement List - Right side */}
-            <div className="w-full lg:w-1/2 space-y-1 md:space-y-3">
+            {/* Achievement List - Right side on desktop, top on mobile */}
+            <div className="w-full lg:w-1/2 space-y-1 md:space-y-3 order-2 lg:order-none">
               {achievements.map((ach, i) => (
                 <div
                   key={ach.id}
-                  onClick={() => { playSound('select', 0.3); setActiveIndex(i); }}
-                  onMouseEnter={() => { playSound('select', 0.3); setActiveIndex(i); }}
+                  onClick={() => {
+                    playSound("select", 0.3);
+                    setActiveIndex(i);
+                  }}
+                  onMouseEnter={() => {
+                    playSound("select", 0.3);
+                    setActiveIndex(i);
+                  }}
                   className={`achievement-card p-2 md:p-5 border-r-4 transition-all duration-300 cursor-pointer ${
                     activeIndex === i
                       ? "bg-zinc-900/40 border-red-600"
@@ -226,9 +289,16 @@ const Achievements = () => {
               ))}
             </div>
 
-            {/* Achievement Preview - Left side */}
-            <div className="w-full lg:w-1/2 achievement-preview lg:sticky lg:top-32 space-y-2 md:space-y-8">
+            {/* Achievement Preview - Left side on desktop, bottom on mobile */}
+            <div className="w-full lg:w-1/2 achievement-preview lg:sticky lg:top-32 space-y-2 md:space-y-8 order-1 lg:order-none">
               <div className="relative aspect-video border border-white/5 overflow-hidden shadow-2xl bg-zinc-900 group">
+                {/* Red moving border */}
+                <div className="absolute inset-0 pointer-events-none z-20">
+                  <div className="achievement-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                  <div className="achievement-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                  <div className="achievement-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                  <div className="achievement-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                </div>
                 <img
                   src={achievements[activeIndex].img}
                   alt={achievements[activeIndex].title}
@@ -237,7 +307,10 @@ const Achievements = () => {
                 {/* Stat badge */}
                 <div className="absolute top-2 md:top-4 left-2 md:left-4 flex items-center gap-1 md:gap-2">
                   <div className="bg-red-600 p-1 md:p-2">
-                    <Award size={12} className="md:w-[16px] md:h-[16px] text-white" />
+                    <Award
+                      size={12}
+                      className="md:w-[16px] md:h-[16px] text-white"
+                    />
                   </div>
                   <div
                     style={pixelFont}
@@ -260,7 +333,8 @@ const Achievements = () => {
                   style={pixelFont}
                   className="text-[8px] md:text-[10px] text-red-600 flex items-center gap-2"
                 >
-                  <Medal size={12} className="md:w-[14px] md:h-[14px]" /> ACHIEVEMENT_UNLOCKED
+                  <Medal size={12} className="md:w-[14px] md:h-[14px]" />{" "}
+                  ACHIEVEMENT_UNLOCKED
                 </div>
                 <p
                   style={appleFont}

@@ -1,37 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { gsap } from "gsap";
 import Hero from "@/components/Hero";
 import LogoShowcase from "@/components/LogoShowcase";
 import HomeProjects from "@/components/HomeProjects";
-import Link from "next/link";
 import { Trophy } from "lucide-react";
 import { playSound } from "@/components/useSoundEffects";
 
 const mobileAchievements = [
   {
     id: "ACH-01",
-    title: "Hackathon Champion",
+    title: "CodeCircuit Hackathon Finalist",
     year: "2024",
-    tags: ["First Place"],
+    tags: ["Top 50", "Outlier.ai"],
+    desc: "Selected in the top 50 out of 5,000+ participants at CodeCircuit Hackathon. Developed a Trivia Quiz Web App with interactive features and real-time scoring. Awarded a paid freelance opportunity at Outlier.ai, $50 Jam credits, and 3 months of Vimcal premium subscription.",
     img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800",
-    stat: "1st Place",
+    stat: "Top 50/5K+",
   },
   {
     id: "ACH-02",
-    title: "Open Source Impact",
-    year: "2023",
-    tags: ["GitHub"],
+    title: "AI Meme Generator Competition Winner",
+    year: "2024",
+    tags: ["1st Place", "Epitome 2K24"],
+    desc: "Secured 1st place in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University, Mangaluru. Demonstrated creativity and innovation with an AI-powered meme generator.",
     img: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800",
-    stat: "500+ Stars",
+    stat: "1st Place",
   },
   {
     id: "ACH-03",
-    title: "AWS Certified",
-    year: "2023",
-    tags: ["Cloud"],
+    title: "Web Development Workshop Mentor",
+    year: "2025",
+    tags: ["Mentor", "HTML & CSS"],
+    desc: "Conducted a full-day HTML & CSS workshop for junior developers on March 22, 2025. Received excellent feedback and strong engagement from participants, helping the next generation of developers.",
     img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800",
-    stat: "Professional",
+    stat: "Full Day",
   },
 ];
 
@@ -51,6 +54,37 @@ export default function Home() {
     setHasAnimated(!!animated);
   }, []);
 
+  useEffect(() => {
+    // Red border animation
+    gsap.to('.home-achievement-border-top', {
+      left: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+    })
+    gsap.to('.home-achievement-border-right', {
+      top: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 0.75,
+    })
+    gsap.to('.home-achievement-border-bottom', {
+      right: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 1.5,
+    })
+    gsap.to('.home-achievement-border-left', {
+      bottom: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 2.25,
+    })
+  }, []);
+
   return (
     <main className="bg-[#050505] min-h-screen">
       <Hero />
@@ -68,6 +102,13 @@ export default function Home() {
 
         {/* Achievement Preview Image */}
         <div className="relative aspect-video mb-2 border border-white/10 overflow-hidden bg-zinc-900">
+          {/* Red moving border */}
+          <div className="absolute inset-0 pointer-events-none z-20">
+            <div className="home-achievement-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="home-achievement-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="home-achievement-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="home-achievement-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+          </div>
           <img
             src={mobileAchievements[activeAchievement].img}
             alt={mobileAchievements[activeAchievement].title}
@@ -138,14 +179,12 @@ export default function Home() {
           ))}
         </div>
 
-        {/* View All Link */}
-        <Link
-          href="/achievements"
-          style={pixelFont}
-          className="block text-center mt-2 text-[7px] text-zinc-500 hover:text-red-500 transition-colors"
-        >
-          VIEW_ALL_ACHIEVEMENTS →
-        </Link>
+        {/* Achievement Description */}
+        <div className="mt-3 p-2 bg-zinc-900/30 border border-zinc-800">
+          <p style={appleFont} className="text-zinc-400 text-xs leading-relaxed">
+            {mobileAchievements[activeAchievement].desc}
+          </p>
+        </div>
       </div>
     </main>
   );
