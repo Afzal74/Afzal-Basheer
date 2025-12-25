@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useLayoutEffect } from 'react'
+import { gsap } from 'gsap'
 import { Terminal, ArrowRight, ShieldCheck, ExternalLink } from 'lucide-react'
 import { playSound } from './useSoundEffects'
 
@@ -46,8 +47,14 @@ const appleFont = { fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Disp
 
 const HomeProjects = () => {
   const imageContainerRef = useRef(null)
+  const containerRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [carouselIndex, setCarouselIndex] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const currentProject = projects[activeIndex]
@@ -59,6 +66,39 @@ const HomeProjects = () => {
 
     return () => clearInterval(interval)
   }, [activeIndex])
+
+  useLayoutEffect(() => {
+    if (!mounted) return
+
+    // Red border animation
+    gsap.to('.project-border-top', {
+      left: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+    })
+    gsap.to('.project-border-right', {
+      top: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 0.75,
+    })
+    gsap.to('.project-border-bottom', {
+      right: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 1.5,
+    })
+    gsap.to('.project-border-left', {
+      bottom: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 2.25,
+    })
+  }, [mounted])
 
   return (
     <section className="block md:hidden py-6 relative z-10">
@@ -126,6 +166,14 @@ const HomeProjects = () => {
           {/* Project Preview */}
           <div className="w-full lg:w-1/2 space-y-2 md:space-y-8">
             <div ref={imageContainerRef} className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden">
+              {/* Red moving border */}
+              <div className="absolute inset-0 pointer-events-none z-20">
+                <div className="project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+              </div>
+              
               <img
                 src={projects[activeIndex].carouselImages ? projects[activeIndex].carouselImages[carouselIndex] : projects[activeIndex].img}
                 alt={projects[activeIndex].title}
