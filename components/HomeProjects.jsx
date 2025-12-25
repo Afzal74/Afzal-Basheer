@@ -61,7 +61,7 @@ const HomeProjects = () => {
   }, [activeIndex])
 
   return (
-    <section className="hidden md:hidden py-6 md:py-20 relative z-10">
+    <section className="block md:hidden py-6 relative z-10">
       <div className="px-4 md:px-12 lg:px-24">
         <div className="mb-4 md:mb-16">
           <div
