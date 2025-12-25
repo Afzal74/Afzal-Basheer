@@ -24,7 +24,9 @@ export const AudioProvider = ({ children }) => {
     if (wasPlaying && audioRef.current) {
       audioRef.current.play().then(() => {
         setIsPlaying(true)
-      }).catch(() => {})
+      }).catch(() => {
+        // Silently fail - browser may block autoplay
+      })
     }
   }, [])
 
@@ -39,8 +41,8 @@ export const AudioProvider = ({ children }) => {
       audioRef.current.play().then(() => {
         setIsPlaying(true)
         sessionStorage.setItem('audioPlaying', 'true')
-      }).catch((error) => {
-        console.error('Playback failed:', error)
+      }).catch(() => {
+        // Silently fail - audio may not be available
         setIsPlaying(false)
       })
     }
@@ -53,7 +55,10 @@ export const AudioProvider = ({ children }) => {
           ref={audioRef}
           src="/Battle Cries of the Lost.mp3"
           loop
-          preload="auto"
+          preload="none"
+          onError={() => {
+            // Silently handle missing audio file
+          }}
         />
       )}
       {children}

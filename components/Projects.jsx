@@ -10,25 +10,35 @@ import SoundLink from './SoundLink'
 const projects = [
   {
     id: 'M-01',
-    title: 'Neural UI',
-    tech: ['React', 'Three.js'],
-    desc: 'High-performance biometric dashboard using WebGL and atomic state management.',
+    title: 'Gamified Learning Platform',
+    tech: ['React.js', 'Node.js', 'MongoDB', 'Supabase', 'Tailwind CSS'],
+    desc: 'A gamified web platform designed to improve learning outcomes in rural schools through engagement and accessibility. Features interactive quizzes, reward-based challenges, real-time progress tracking, and personalized learning paths for students.',
     img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800',
+    carouselImages: [
+      '/gamified learning platform/Home.jpg',
+      '/gamified learning platform/Live class.jpg',
+      '/gamified learning platform/Realtime quiz.jpg',
+      '/gamified learning platform/Student Pov.png'
+    ],
     link: '#'
   },
   {
     id: 'M-02',
-    title: 'Cyber-Deck',
-    tech: ['Next.js', 'Tailwind'],
-    desc: 'Decentralized trade platform with real-time WebSocket data visualization.',
+    title: 'QuizVerse',
+    tech: ['Next.js', 'Tailwind CSS', 'Firebase', 'Zustand', 'TypeScript'],
+    desc: 'A trivia quiz app featuring multiple categories, multiplayer mode, and PWA support. Implemented multiplayer functionality, leaderboard system, and offline support for seamless user experience.',
     img: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=800',
+    carouselImages: [
+      '/QuizVerse/quizverse.jpg',
+      '/QuizVerse/Realtime.jpg'
+    ],
     link: '#'
   },
   {
     id: 'M-03',
-    title: 'Shadow Link',
-    tech: ['Python', 'Docker'],
-    desc: 'End-to-end encrypted relay for secure file transmission across unstable networks.',
+    title: 'Autocorrect Tool',
+    tech: ['Java'],
+    desc: 'A Java package for easy integration of autocorrect features in applications. Imports a dictionary and suggests closely matching words based on user input for improved text accuracy.',
     img: 'https://images.unsplash.com/photo-1510511459019-5dee997ddfdf?q=80&w=800',
     link: '#'
   }
@@ -40,13 +50,29 @@ const appleFont = { fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Disp
 const Projects = () => {
   const containerRef = useRef(null)
   const navRef = useRef(null)
+  const imageContainerRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [carouselIndex, setCarouselIndex] = useState(0)
 
   useEffect(() => {
     setMounted(true)
     preloadSounds()
   }, [])
+
+  // Carousel effect for projects with carousel images
+  useEffect(() => {
+    if (!mounted) return
+    
+    const currentProject = projects[activeIndex]
+    if (!currentProject.carouselImages) return
+
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % currentProject.carouselImages.length)
+    }, 2500)
+
+    return () => clearInterval(interval)
+  }, [activeIndex, mounted])
 
   useLayoutEffect(() => {
     if (!mounted) return
@@ -60,6 +86,34 @@ const Projects = () => {
       gsap.set('.projects-header', { opacity: 1, y: 0 })
       gsap.set('.project-card', { opacity: 1, x: 0 })
       gsap.set('.project-preview', { opacity: 1, scale: 1 })
+      // Still run border animations
+      gsap.to('.project-border-top', {
+        left: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+      })
+      gsap.to('.project-border-right', {
+        top: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 0.75,
+      })
+      gsap.to('.project-border-bottom', {
+        right: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 1.5,
+      })
+      gsap.to('.project-border-left', {
+        bottom: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 2.25,
+      })
       return
     }
 
@@ -74,6 +128,35 @@ const Projects = () => {
       // Mark animations as complete
       sessionStorage.setItem('projectsAnimated', 'true')
     }, containerRef)
+
+    // Red border animation - outside context
+    gsap.to('.project-border-top', {
+      left: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+    })
+    gsap.to('.project-border-right', {
+      top: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 0.75,
+    })
+    gsap.to('.project-border-bottom', {
+      right: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 1.5,
+    })
+    gsap.to('.project-border-left', {
+      bottom: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'none',
+      delay: 2.25,
+    })
 
     return () => ctx.revert()
   }, [mounted])
@@ -163,9 +246,17 @@ const Projects = () => {
 
           {/* Project Preview */}
           <div className="w-full lg:w-1/2 project-preview lg:sticky lg:top-32 space-y-4 md:space-y-8">
-            <div className="relative aspect-video border border-white/5 overflow-hidden shadow-2xl bg-zinc-900 group">
+            <div ref={imageContainerRef} className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden">
+              {/* Red moving border */}
+              <div className="absolute inset-0 pointer-events-none z-20">
+                <div className="project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="project-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+              </div>
+              
               <img
-                src={projects[activeIndex].img}
+                src={projects[activeIndex].carouselImages ? projects[activeIndex].carouselImages[carouselIndex] : projects[activeIndex].img}
                 alt={projects[activeIndex].title}
                 className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
               />

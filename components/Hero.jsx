@@ -7,10 +7,9 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { Music, Volume2 } from "lucide-react";
+import { Music, Volume2, Trophy } from "lucide-react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
-import Link from "next/link";
 import emailjs from "@emailjs/browser";
 import { useAudio } from "./AudioProvider";
 import { playSound, preloadSounds } from "./useSoundEffects";
@@ -24,6 +23,24 @@ const EMAILJS_PUBLIC_KEY = "UQZ_lKGW2Ghjw5Gnc";
 // Register GSAP plugins
 if (typeof window !== "undefined") {
   gsap.registerPlugin(TextPlugin);
+}
+
+// Add animation styles
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-60px) translateX(-50%);
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 const Hero = () => {
@@ -43,9 +60,8 @@ const Hero = () => {
   const [bounty, setBounty] = useState(0);
   const [isShattered, setIsShattered] = useState(false);
   const [isCaptured, setIsCaptured] = useState(false);
-  const [imgUrl, setImgUrl] = useState(
-    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=600&auto=format&fit=crop"
-  );
+  const [bountyPopups, setBountyPopups] = useState([]);
+  const [imgUrl, setImgUrl] = useState("/actual image/code sus.jpg");
   const [neutralizedPosters, setNeutralizedPosters] = useState([]);
   const [formState, setFormState] = useState({
     name: "",
@@ -58,6 +74,7 @@ const Hero = () => {
   const roles = ["Web Developer", "Designer", "Vibe"];
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
 
+  // Glass shards - 4 triangular pieces meeting at center
   const shards = [
     "polygon(0 0, 100% 0, 50% 50%, 0 50%)",
     "polygon(100% 0, 100% 100%, 50% 50%)",
@@ -99,17 +116,14 @@ const Hero = () => {
   };
 
   const getRandomImage = useCallback(() => {
-    const portraitIds = [
-      "1507003211169-0a1dd7228f2d",
-      "1500648767791-00dcc994a43e",
-      "1472099645785-5658abf4ff4e",
-      "1544005313-94ddf0286df2",
-      "1552058544-bd2d08422151",
-      "1599566150163-29194dcaad36",
+    const localImages = [
+      "/actual image/code sus.jpg",
+      "/actual image/spiderman.jpg",
+      "/actual image/spongebob.jpg",
     ];
-    const randomId =
-      portraitIds[Math.floor(Math.random() * portraitIds.length)];
-    return `https://images.unsplash.com/photo-${randomId}?q=80&w=600&auto=format&fit=crop`;
+    const randomImage =
+      localImages[Math.floor(Math.random() * localImages.length)];
+    return randomImage;
   }, []);
 
   const SplitText = ({ text, className, charClassName }) => (
@@ -167,6 +181,35 @@ const Hero = () => {
       gsap.set(wantedRef.current, { opacity: 1, scale: 1 });
       gsap.set(".target-box", { opacity: 1, scale: 1 });
       gsap.set(".target-shard", { opacity: 1, scale: 1, rotation: 0 });
+
+      // Traveling border animation
+      gsap.to(".traveling-border", {
+        left: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+      });
+      gsap.to(".traveling-border-right", {
+        top: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 0.5,
+      });
+      gsap.to(".traveling-border-bottom", {
+        right: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 1,
+      });
+      gsap.to(".traveling-border-left", {
+        bottom: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 1.5,
+      });
 
       // Start the role rotation
       const interval = setInterval(() => {
@@ -310,6 +353,35 @@ const Hero = () => {
         "-=0.5"
       );
 
+      // Traveling border animation
+      gsap.to(".traveling-border", {
+        left: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+      });
+      gsap.to(".traveling-border-right", {
+        top: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 0.5,
+      });
+      gsap.to(".traveling-border-bottom", {
+        right: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 1,
+      });
+      gsap.to(".traveling-border-left", {
+        bottom: "100%",
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        delay: 1.5,
+      });
+
       gsap.to(auraRef.current, {
         scale: 1.1,
         opacity: 0.35,
@@ -418,6 +490,18 @@ const Hero = () => {
     const newBounty = bounty + 125000;
     setBounty(newBounty);
 
+    // Add bounty popup animation
+    const popupId = Date.now();
+    setBountyPopups((prev) => [...prev, { id: popupId, amount: 125000 }]);
+    setTimeout(() => {
+      setBountyPopups((prev) => prev.filter((p) => p.id !== popupId));
+    }, 1500);
+
+    // Show final image one step before $1,000,000
+    if (newBounty >= 875000 && bounty < 875000) {
+      setImgUrl("/actual image/afzal bounty.png");
+    }
+
     if (newBounty >= 1000000) {
       setIsCaptured(true);
 
@@ -434,6 +518,7 @@ const Hero = () => {
         duration: 1.5,
       });
 
+      // Glass shards fly apart on capture
       gsap.to(".target-shard", {
         rotation: 360,
         scale: 0.5,
@@ -467,6 +552,7 @@ const Hero = () => {
       onComplete: () => streak.remove(),
     });
 
+    // Glass shards scatter animation
     gsap.to(".target-shard", {
       x: (i) => (i === 0 ? -80 : i === 1 ? 80 : i === 2 ? 40 : -40),
       y: (i) => (i === 0 ? -80 : i === 1 ? -40 : i === 2 ? 80 : 40),
@@ -476,18 +562,16 @@ const Hero = () => {
       duration: 0.5,
       onComplete: () => {
         setImgUrl(getRandomImage());
-        setTimeout(() => {
-          gsap.to(".target-shard", {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.8,
-            ease: "elastic.out(1, 0.6)",
-            onComplete: () => setIsShattered(false),
-          });
-        }, 500);
+        gsap.to(".target-shard", {
+          x: 0,
+          y: 0,
+          rotation: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.8,
+          ease: "elastic.out(1, 0.6)",
+          onComplete: () => setIsShattered(false),
+        });
       },
     });
   };
@@ -673,16 +757,29 @@ const Hero = () => {
                   style={appleFont}
                   className="desc-line text-zinc-500 text-[8px] md:text-lg lg:text-xl max-w-lg leading-snug md:leading-relaxed font-light border-l border-zinc-800 pl-2 md:pl-6 opacity-0"
                 >
-                  {"Creative engineer specializing in high-fidelity interaction and gaming-inspired motion systems. Bridging the gap between code and emotion."
-                    .split(" ")
-                    .map((word, i) => (
-                      <span
-                        key={i}
-                        className="word inline-block mr-1 opacity-0"
-                      >
-                        {word}
-                      </span>
-                    ))}
+                  {[
+                    { text: "Creative", highlight: false },
+                    { text: "engineer", highlight: false },
+                    { text: "specializing", highlight: false },
+                    { text: "in", highlight: false },
+                    { text: "high-fidelity", highlight: false },
+                    { text: "interaction", highlight: true },
+                    { text: "and", highlight: false },
+                    { text: "gaming-inspired", highlight: false },
+                    { text: "motion", highlight: true },
+                    { text: "systems.", highlight: false },
+                    { text: "Bridging", highlight: false },
+                    { text: "the", highlight: false },
+                    { text: "gap", highlight: false },
+                    { text: "between", highlight: false },
+                    { text: "code", highlight: true },
+                    { text: "and", highlight: false },
+                    { text: "emotion.", highlight: false },
+                  ].map((word, i) => (
+                    <span key={i} className="word inline-block mr-1 opacity-0">
+                      {word.text}
+                    </span>
+                  ))}
                 </p>
               </div>
             </div>
@@ -718,8 +815,15 @@ const Hero = () => {
                   <div
                     ref={targetAreaRef}
                     onClick={handleSlash}
-                    className="target-box relative w-full max-w-[120px] md:max-w-[320px] aspect-square group active:scale-95 transition-transform mx-auto opacity-0"
+                    className="target-box relative w-full max-w-[120px] md:max-w-[320px] aspect-square group active:scale-95 transition-transform mx-auto opacity-0 overflow-hidden"
                   >
+                    {/* Traveling border animation */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
+                      <div className="traveling-border absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent" />
+                      <div className="traveling-border-right absolute top-[-100%] right-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent" />
+                      <div className="traveling-border-bottom absolute bottom-0 right-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent" />
+                      <div className="traveling-border-left absolute bottom-[-100%] left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent" />
+                    </div>
                     <div className="relative w-full h-full border-[1px] border-white/5 overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.9)] bg-black">
                       {shards.map((clip, i) => (
                         <div
@@ -736,7 +840,7 @@ const Hero = () => {
                           <img
                             src={imgUrl}
                             alt="Identity"
-                            className="w-full h-full object-cover grayscale brightness-50 group-hover:brightness-110 group-hover:grayscale-0 transition-all duration-1000"
+                            className="w-full h-full object-cover transition-all duration-1000 grayscale brightness-100 group-hover:grayscale-0"
                           />
                         </div>
                       ))}
@@ -748,6 +852,24 @@ const Hero = () => {
                         <div className="w-0.5 h-0.5 md:w-1 md:h-1 bg-red-600 rounded-full" />
                       </div>
                     </div>
+
+                    {/* Bounty Popups */}
+                    {bountyPopups.map((popup) => (
+                      <div
+                        key={popup.id}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{
+                          animation: `floatUp 1.5s ease-out forwards`,
+                        }}
+                      >
+                        <div
+                          style={pixelFont}
+                          className="text-[10px] md:text-lg font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] whitespace-nowrap"
+                        >
+                          +${popup.amount.toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </>
               ) : (

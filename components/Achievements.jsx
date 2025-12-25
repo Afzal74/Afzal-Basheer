@@ -10,48 +10,30 @@ import SoundLink from "./SoundLink";
 const achievements = [
   {
     id: "ACH-01",
-    title: "Hackathon Champion",
+    title: "CodeCircuit Hackathon Finalist",
     year: "2024",
-    tags: ["First Place", "Team Lead"],
-    desc: "Led a team of 4 developers to victory at TechFest 2024. Built an AI-powered accessibility tool in 48 hours that impressed judges with its innovation and execution.",
+    tags: ["Top 50", "Outlier.ai"],
+    desc: "Selected in the top 50 out of 5,000+ participants at CodeCircuit Hackathon. Developed a Trivia Quiz Web App and awarded a paid freelance opportunity at Outlier.ai, $50 Jam credits, and 3 months of Vimcal premium.",
     img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800",
-    stat: "1st Place",
+    stat: "Top 50/5K+",
   },
   {
     id: "ACH-02",
-    title: "Open Source Impact",
-    year: "2023",
-    tags: ["GitHub", "Community"],
-    desc: "Created a React component library that gained massive traction in the developer community. Featured in JavaScript Weekly and adopted by startups worldwide.",
+    title: "AI Meme Generator Competition Winner",
+    year: "2024",
+    tags: ["1st Place", "Epitome 2K24"],
+    desc: "Secured 1st place in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University, Mangaluru. Demonstrated creativity and innovation with an AI-powered meme generator.",
     img: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800",
-    stat: "500+ Stars",
+    stat: "1st Place",
   },
   {
     id: "ACH-03",
-    title: "AWS Certified",
-    year: "2023",
-    tags: ["Cloud", "Architecture"],
-    desc: "Earned the AWS Solutions Architect Professional certification, demonstrating expertise in designing distributed systems and cloud infrastructure.",
+    title: "Web Development Workshop Mentor",
+    year: "2025",
+    tags: ["Mentor", "HTML & CSS"],
+    desc: "Conducted a full-day HTML & CSS workshop for junior developers on March 22, 2025. Received excellent feedback and strong engagement from participants, helping the next generation of developers.",
     img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800",
-    stat: "Professional",
-  },
-  {
-    id: "ACH-04",
-    title: "Tech Speaker",
-    year: "2024",
-    tags: ["Conference", "Mentor"],
-    desc: "Delivered talks at 3 major tech conferences on web performance and modern React patterns. Reached over 2000 developers through workshops and sessions.",
-    img: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=800",
-    stat: "2K+ Reached",
-  },
-  {
-    id: "ACH-05",
-    title: "Product Launch",
-    year: "2024",
-    tags: ["Startup", "SaaS"],
-    desc: "Successfully launched a developer productivity tool that acquired 10,000 users in the first month. Featured on Product Hunt with 500+ upvotes.",
-    img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800",
-    stat: "10K Users",
+    stat: "Full Day",
   },
 ];
 
@@ -187,6 +169,7 @@ const Achievements = () => {
               {achievements.map((ach, i) => (
                 <div
                   key={ach.id}
+                  onClick={() => { playSound('select', 0.3); setActiveIndex(i); }}
                   onMouseEnter={() => { playSound('select', 0.3); setActiveIndex(i); }}
                   className={`achievement-card p-5 border-r-4 transition-all duration-300 cursor-pointer ${
                     activeIndex === i
