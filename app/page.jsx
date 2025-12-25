@@ -56,7 +56,6 @@ export default function Home() {
       <Hero />
       <LogoShowcase />
       <HomeProjects />
-      <HomeProjects />
 
       {/* Achievements section - only visible on mobile */}
       <div className="block md:hidden px-4 pt-4 pb-6 relative z-10 border-t border-zinc-900" style={{opacity: hasAnimated ? 1 : 0, animation: hasAnimated ? 'none' : `fadeIn 1s ease-out 4s forwards`}}>
