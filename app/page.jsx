@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import Hero from "@/components/Hero";
 import LogoShowcase from "@/components/LogoShowcase";
@@ -57,15 +57,51 @@ const appleFont = {
 
 export default function Home() {
   const [activeAchievement, setActiveAchievement] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [imageClicked, setImageClicked] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const achievementsRef = useRef(null);
 
   useEffect(() => {
-    // Check if animations already played
-    const animated = sessionStorage.getItem("heroAnimated");
-    setHasAnimated(!!animated);
+    setMounted(true);
   }, []);
+
+  // Animate achievements section on mobile
+  useEffect(() => {
+    if (!mounted) return;
+
+    const hasAnimated = sessionStorage.getItem("heroAnimated");
+    
+    if (hasAnimated) {
+      // Already animated, show immediately
+      if (achievementsRef.current) {
+        achievementsRef.current.style.opacity = '1';
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (achievementsRef.current) {
+        gsap.fromTo(
+          achievementsRef.current,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+        );
+      }
+    }, 3500);
+
+    const fallbackTimer = setTimeout(() => {
+      if (achievementsRef.current) {
+        achievementsRef.current.style.opacity = '1';
+        achievementsRef.current.style.transform = 'translateY(0)';
+      }
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(fallbackTimer);
+    };
+  }, [mounted]);
 
   // Carousel effect for achievements with carousel images
   useEffect(() => {
@@ -89,8 +125,8 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Red border animation
   useEffect(() => {
-    // Red border animation
     gsap.to('.home-achievement-border-top', {
       left: '100%',
       duration: 3,
@@ -127,7 +163,11 @@ export default function Home() {
       <HomeProjects />
 
       {/* Achievements section - only visible on mobile */}
-      <div className="block md:hidden px-4 pt-4 pb-6 relative z-10 border-t border-zinc-900" style={{opacity: hasAnimated ? 1 : 0, animation: hasAnimated ? 'none' : `fadeIn 1s ease-out 4s forwards`}}>
+      <div 
+        ref={achievementsRef}
+        className="block md:hidden px-4 pt-4 pb-6 relative z-10 border-t border-zinc-900" 
+        style={{ opacity: 0 }}
+      >
         <div className="mb-2 flex items-center gap-2">
           <Trophy size={14} className="text-red-500" />
           <h2 style={appleFont} className="text-lg font-bold text-white">
