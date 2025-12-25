@@ -70,6 +70,52 @@ const HomeProjects = () => {
   useLayoutEffect(() => {
     if (!mounted) return
 
+    // Check if animations already played this session
+    const hasAnimated = sessionStorage.getItem('heroAnimated')
+
+    if (hasAnimated) {
+      // Skip animation, just show it
+      gsap.set(containerRef.current, { opacity: 1, y: 0 })
+      // Still run border animations
+      gsap.to('.project-border-top', {
+        left: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+      })
+      gsap.to('.project-border-right', {
+        top: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 0.75,
+      })
+      gsap.to('.project-border-bottom', {
+        right: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 1.5,
+      })
+      gsap.to('.project-border-left', {
+        bottom: '100%',
+        duration: 3,
+        repeat: -1,
+        ease: 'none',
+        delay: 2.25,
+      })
+      return
+    }
+
+    // Delay to sync with Hero animation sequence
+    const timer = setTimeout(() => {
+      gsap.fromTo(
+        containerRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+      );
+    }, 4000); // Appears after hero animations complete
+
     // Red border animation
     gsap.to('.project-border-top', {
       left: '100%',
@@ -98,10 +144,12 @@ const HomeProjects = () => {
       ease: 'none',
       delay: 2.25,
     })
+
+    return () => clearTimeout(timer)
   }, [mounted])
 
   return (
-    <section className="block md:hidden py-6 relative z-10">
+    <section className="block md:hidden py-6 relative z-10 opacity-0" ref={containerRef}>
       <div className="px-4 md:px-12 lg:px-24">
         <div className="mb-4 md:mb-16">
           <div

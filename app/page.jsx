@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Hero from "@/components/Hero";
 import LogoShowcase from "@/components/LogoShowcase";
 import HomeProjects from "@/components/HomeProjects";
@@ -43,15 +43,23 @@ const appleFont = {
 
 export default function Home() {
   const [activeAchievement, setActiveAchievement] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    // Check if animations already played
+    const animated = sessionStorage.getItem("heroAnimated");
+    setHasAnimated(!!animated);
+  }, []);
 
   return (
     <main className="bg-[#050505] min-h-screen">
       <Hero />
       <LogoShowcase />
       <HomeProjects />
+      <HomeProjects />
 
       {/* Achievements section - only visible on mobile */}
-      <div className="block md:hidden px-4 pt-4 pb-6 relative z-10 border-t border-zinc-900">
+      <div className="block md:hidden px-4 pt-4 pb-6 relative z-10 border-t border-zinc-900" style={{opacity: hasAnimated ? 1 : 0, animation: hasAnimated ? 'none' : `fadeIn 1s ease-out 4s forwards`}}>
         <div className="mb-2 flex items-center gap-2">
           <Trophy size={14} className="text-red-500" />
           <h2 style={appleFont} className="text-lg font-bold text-white">
