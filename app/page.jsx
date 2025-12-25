@@ -16,6 +16,9 @@ const mobileAchievements = [
     tags: ["Top 50", "Outlier.ai"],
     desc: "Selected in the top 50 out of 5,000+ participants at CodeCircuit Hackathon. Developed a Trivia Quiz Web App with interactive features and real-time scoring. Awarded a paid freelance opportunity at Outlier.ai, $50 Jam credits, and 3 months of Vimcal premium subscription.",
     img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800",
+    carouselImages: [
+      '/Achievements/codecircuit/CodeCircuit.jpg',
+    ],
     stat: "Top 50/5K+",
   },
   {
@@ -25,6 +28,10 @@ const mobileAchievements = [
     tags: ["1st Place", "Epitome 2K24"],
     desc: "Secured 1st place in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University, Mangaluru. Demonstrated creativity and innovation with an AI-powered meme generator.",
     img: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800",
+    carouselImages: [
+      '/Achievements/Ai meme generator/Ai meme generator.jpg',
+      '/Achievements/Ai meme generator/ai meme generator2.jpg',
+    ],
     stat: "1st Place",
   },
   {
@@ -34,6 +41,10 @@ const mobileAchievements = [
     tags: ["Mentor", "HTML & CSS"],
     desc: "Conducted a full-day HTML & CSS workshop for junior developers on March 22, 2025. Received excellent feedback and strong engagement from participants, helping the next generation of developers.",
     img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800",
+    carouselImages: [
+      '/Achievements/web development workshop/The workshop.jpg',
+      '/Achievements/web development workshop/workshop 2.jpg',
+    ],
     stat: "Full Day",
   },
 ];
@@ -47,11 +58,35 @@ const appleFont = {
 export default function Home() {
   const [activeAchievement, setActiveAchievement] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [imageClicked, setImageClicked] = useState(false);
 
   useEffect(() => {
     // Check if animations already played
     const animated = sessionStorage.getItem("heroAnimated");
     setHasAnimated(!!animated);
+  }, []);
+
+  // Carousel effect for achievements with carousel images
+  useEffect(() => {
+    const currentAchievement = mobileAchievements[activeAchievement];
+    if (!currentAchievement.carouselImages) return;
+
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % currentAchievement.carouselImages.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [activeAchievement]);
+
+  // Reset grayscale on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setImageClicked(false);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -101,7 +136,10 @@ export default function Home() {
         </div>
 
         {/* Achievement Preview Image */}
-        <div className="relative aspect-video mb-2 border border-white/10 overflow-hidden bg-zinc-900">
+        <div 
+          className="relative aspect-video mb-2 border border-white/10 overflow-hidden bg-zinc-900 group cursor-pointer"
+          onClick={() => setImageClicked(!imageClicked)}
+        >
           {/* Red moving border */}
           <div className="absolute inset-0 pointer-events-none z-20">
             <div className="home-achievement-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
@@ -110,9 +148,11 @@ export default function Home() {
             <div className="home-achievement-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
           </div>
           <img
-            src={mobileAchievements[activeAchievement].img}
+            src={mobileAchievements[activeAchievement].carouselImages ? mobileAchievements[activeAchievement].carouselImages[carouselIndex] : mobileAchievements[activeAchievement].img}
             alt={mobileAchievements[activeAchievement].title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-all duration-1000 ${
+              imageClicked ? 'grayscale-0 brightness-100' : 'grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100'
+            }`}
           />
           <div
             style={pixelFont}
@@ -136,6 +176,7 @@ export default function Home() {
               onClick={() => {
                 playSound("select", 0.3);
                 setActiveAchievement(i);
+                setImageClicked(false);
               }}
               className={`p-2 border-l-2 transition-all cursor-pointer ${
                 activeAchievement === i

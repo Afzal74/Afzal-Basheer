@@ -51,6 +51,7 @@ const HomeProjects = () => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [imageClicked, setImageClicked] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -66,6 +67,16 @@ const HomeProjects = () => {
 
     return () => clearInterval(interval)
   }, [activeIndex])
+
+  // Reset grayscale on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setImageClicked(false)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useLayoutEffect(() => {
     if (!mounted) return
@@ -169,7 +180,7 @@ const HomeProjects = () => {
             {projects.map((proj, i) => (
               <div
                 key={proj.id}
-                onClick={() => { playSound('select', 0.3); setActiveIndex(i); }}
+                onClick={() => { playSound('select', 0.3); setActiveIndex(i); setImageClicked(false); }}
                 onMouseEnter={() => { playSound('select', 0.3); setActiveIndex(i); }}
                 className={`project-card p-2 md:p-6 border-l-4 transition-all duration-300 cursor-pointer ${
                   activeIndex === i
@@ -213,7 +224,11 @@ const HomeProjects = () => {
 
           {/* Project Preview */}
           <div className="w-full lg:w-1/2 space-y-2 md:space-y-8">
-            <div ref={imageContainerRef} className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden">
+            <div 
+              ref={imageContainerRef} 
+              className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden cursor-pointer"
+              onClick={() => setImageClicked(!imageClicked)}
+            >
               {/* Red moving border */}
               <div className="absolute inset-0 pointer-events-none z-20">
                 <div className="project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
@@ -225,7 +240,9 @@ const HomeProjects = () => {
               <img
                 src={projects[activeIndex].carouselImages ? projects[activeIndex].carouselImages[carouselIndex] : projects[activeIndex].img}
                 alt={projects[activeIndex].title}
-                className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
+                className={`w-full h-full object-cover transition-all duration-1000 ${
+                  imageClicked ? 'grayscale-0 brightness-100' : 'grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100'
+                }`}
               />
               <div
                 className="absolute top-2 md:top-4 right-2 md:right-4 text-[6px] md:text-[8px] bg-black/80 p-1 md:p-2 border border-red-900/30 text-red-600"
