@@ -144,34 +144,34 @@ const Achievements = () => {
         </div>
       </nav>
 
-      <section className="min-h-screen pt-32 pb-20">
+      <section className="min-h-screen pt-16 md:pt-32 pb-10 md:pb-20">
         <div className="container mx-auto px-4 md:px-12 lg:px-24">
           {/* Header */}
-          <div className="achievements-header mb-16">
+          <div className="achievements-header mb-6 md:mb-16">
             <div
               style={pixelFont}
-              className="text-zinc-600 text-[10px] tracking-widest mb-4 uppercase flex items-center gap-2"
+              className="text-zinc-600 text-[8px] md:text-[10px] tracking-widest mb-2 md:mb-4 uppercase flex items-center gap-2"
             >
-              <Trophy size={14} /> Trophy_Cabinet / {achievements.length}{" "}
+              <Trophy size={12} className="md:w-[14px] md:h-[14px]" /> Trophy_Cabinet / {achievements.length}{" "}
               Unlocked
             </div>
             <h2
               style={appleFont}
-              className="text-4xl md:text-5xl font-bold text-white"
+              className="text-2xl md:text-5xl font-bold text-white"
             >
               Achievements
             </h2>
           </div>
 
-          <div className="flex flex-col lg:flex-row-reverse gap-12 items-start">
+          <div className="flex flex-col lg:flex-row-reverse gap-6 md:gap-12 items-start">
             {/* Achievement List - Right side */}
-            <div className="w-full lg:w-1/2 space-y-3">
+            <div className="w-full lg:w-1/2 space-y-1 md:space-y-3">
               {achievements.map((ach, i) => (
                 <div
                   key={ach.id}
                   onClick={() => { playSound('select', 0.3); setActiveIndex(i); }}
                   onMouseEnter={() => { playSound('select', 0.3); setActiveIndex(i); }}
-                  className={`achievement-card p-5 border-r-4 transition-all duration-300 cursor-pointer ${
+                  className={`achievement-card p-2 md:p-5 border-r-4 transition-all duration-300 cursor-pointer ${
                     activeIndex === i
                       ? "bg-zinc-900/40 border-red-600"
                       : "bg-transparent border-zinc-900 hover:border-zinc-700"
@@ -179,17 +179,18 @@ const Achievements = () => {
                 >
                   <div className="flex justify-between items-center">
                     <ArrowRight
-                      className={`text-white transition-all duration-500 ${
+                      size={12}
+                      className={`text-white transition-all duration-500 hidden md:block ${
                         activeIndex === i
                           ? "translate-x-0 opacity-100"
                           : "translate-x-4 opacity-0"
                       }`}
                     />
-                    <div className="space-y-2 text-right flex-1 ml-4">
-                      <div className="flex items-center justify-end gap-3">
+                    <div className="space-y-0.5 md:space-y-2 text-right flex-1 ml-2 md:ml-4">
+                      <div className="flex items-center justify-end gap-2 md:gap-3">
                         <span
                           style={pixelFont}
-                          className={`text-[8px] ${
+                          className={`text-[5px] md:text-[8px] ${
                             activeIndex === i ? "text-red-500" : "text-zinc-600"
                           }`}
                         >
@@ -197,23 +198,23 @@ const Achievements = () => {
                         </span>
                         <span
                           style={pixelFont}
-                          className="text-[8px] text-zinc-700"
+                          className="text-[5px] md:text-[8px] text-zinc-700"
                         >
                           {ach.year}
                         </span>
                       </div>
                       <h3
                         style={appleFont}
-                        className="text-xl md:text-2xl font-black tracking-tighter uppercase text-white"
+                        className="text-xs md:text-2xl font-black tracking-tighter uppercase text-white"
                       >
                         {ach.title}
                       </h3>
-                      <div className="flex gap-2 flex-wrap justify-end">
+                      <div className="flex gap-1 md:gap-2 flex-wrap justify-end">
                         {ach.tags.map((tag) => (
                           <span
                             key={tag}
                             style={pixelFont}
-                            className="text-[6px] bg-zinc-800 text-zinc-400 px-2 py-1"
+                            className="text-[4px] md:text-[6px] bg-zinc-800 text-zinc-400 px-1 md:px-2 py-0.5 md:py-1"
                           >
                             {tag}
                           </span>
@@ -226,7 +227,7 @@ const Achievements = () => {
             </div>
 
             {/* Achievement Preview - Left side */}
-            <div className="w-full lg:w-1/2 achievement-preview lg:sticky lg:top-32 space-y-8">
+            <div className="w-full lg:w-1/2 achievement-preview lg:sticky lg:top-32 space-y-2 md:space-y-8">
               <div className="relative aspect-video border border-white/5 overflow-hidden shadow-2xl bg-zinc-900 group">
                 <img
                   src={achievements[activeIndex].img}
@@ -234,50 +235,50 @@ const Achievements = () => {
                   className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
                 />
                 {/* Stat badge */}
-                <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <div className="bg-red-600 p-2">
-                    <Award size={16} className="text-white" />
+                <div className="absolute top-2 md:top-4 left-2 md:left-4 flex items-center gap-1 md:gap-2">
+                  <div className="bg-red-600 p-1 md:p-2">
+                    <Award size={12} className="md:w-[16px] md:h-[16px] text-white" />
                   </div>
                   <div
                     style={pixelFont}
-                    className="text-[10px] bg-black/80 px-3 py-2 border border-red-900/30 text-white"
+                    className="text-[8px] md:text-[10px] bg-black/80 px-2 md:px-3 py-1 md:py-2 border border-red-900/30 text-white"
                   >
                     {achievements[activeIndex].stat}
                   </div>
                 </div>
                 {/* Year */}
                 <div
-                  className="absolute bottom-4 right-4 text-[8px] bg-black/80 p-2 border border-zinc-800 text-zinc-400"
+                  className="absolute bottom-2 md:bottom-4 right-2 md:right-4 text-[6px] md:text-[8px] bg-black/80 p-1 md:p-2 border border-zinc-800 text-zinc-400"
                   style={pixelFont}
                 >
                   YEAR: {achievements[activeIndex].year}
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-2 md:space-y-6">
                 <div
                   style={pixelFont}
-                  className="text-[10px] text-red-600 flex items-center gap-2"
+                  className="text-[8px] md:text-[10px] text-red-600 flex items-center gap-2"
                 >
-                  <Medal size={14} /> ACHIEVEMENT_UNLOCKED
+                  <Medal size={12} className="md:w-[14px] md:h-[14px]" /> ACHIEVEMENT_UNLOCKED
                 </div>
                 <p
                   style={appleFont}
-                  className="text-zinc-400 text-lg font-light leading-relaxed"
+                  className="text-zinc-400 text-xs md:text-lg font-light leading-relaxed"
                 >
                   {achievements[activeIndex].desc}
                 </p>
 
                 {/* Progress bar decoration */}
-                <div className="space-y-2">
+                <div className="space-y-1 md:space-y-2">
                   <div
-                    className="flex justify-between text-[8px]"
+                    className="flex justify-between text-[6px] md:text-[8px]"
                     style={pixelFont}
                   >
                     <span className="text-zinc-600">COMPLETION</span>
                     <span className="text-red-500">100%</span>
                   </div>
-                  <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-0.5 md:h-1 bg-zinc-800 rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-red-600 to-red-400 w-full" />
                   </div>
                 </div>

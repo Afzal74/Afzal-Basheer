@@ -39,6 +39,17 @@ if (typeof document !== "undefined") {
         transform: translateY(-60px) translateX(-50%);
       }
     }
+    @keyframes holeExpand {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -63,6 +74,8 @@ const Hero = () => {
   const [bountyPopups, setBountyPopups] = useState([]);
   const [imgUrl, setImgUrl] = useState("/actual image/code sus.jpg");
   const [neutralizedPosters, setNeutralizedPosters] = useState([]);
+  const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
+  const [holes, setHoles] = useState([]);
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -452,6 +465,15 @@ const Hero = () => {
   const handleSlash = () => {
     if (isShattered || isCaptured) return;
 
+    // Add hole at current hover position
+    const holeId = Date.now();
+    setHoles((prev) => [...prev, { id: holeId, x: hoverPos.x, y: hoverPos.y }]);
+    
+    // Remove hole after animation
+    setTimeout(() => {
+      setHoles((prev) => prev.filter((h) => h.id !== holeId));
+    }, 600);
+
     // Play gunshot and glass break sounds
     const gunshot = new Audio(
       "https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"
@@ -755,7 +777,7 @@ const Hero = () => {
                 <p
                   ref={descRef}
                   style={appleFont}
-                  className="desc-line text-zinc-500 text-[8px] md:text-lg lg:text-xl max-w-lg leading-snug md:leading-relaxed font-light border-l border-zinc-800 pl-2 md:pl-6 opacity-0"
+                  className="desc-line text-zinc-500 text-[8px] md:text-lg lg:text-xl max-w-[200px] md:max-w-lg leading-snug md:leading-relaxed font-light border-l border-zinc-800 pl-2 md:pl-6 opacity-0"
                 >
                   {[
                     { text: "Creative", highlight: false },
@@ -815,7 +837,14 @@ const Hero = () => {
                   <div
                     ref={targetAreaRef}
                     onClick={handleSlash}
-                    className="target-box relative w-full max-w-[120px] md:max-w-[320px] aspect-square group active:scale-95 transition-transform mx-auto opacity-0 overflow-hidden"
+                    onMouseMove={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setHoverPos({
+                        x: ((e.clientX - rect.left) / rect.width) * 100,
+                        y: ((e.clientY - rect.top) / rect.height) * 100,
+                      });
+                    }}
+                    className="target-box relative w-full max-w-[120px] md:max-w-[320px] aspect-square group active:scale-95 transition-transform mx-auto opacity-0 overflow-hidden cursor-crosshair"
                   >
                     {/* Traveling border animation */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
@@ -870,10 +899,26 @@ const Hero = () => {
                         </div>
                       </div>
                     ))}
+
+                    {/* Holes */}
+                    {holes.map((hole) => (
+                      <div
+                        key={hole.id}
+                        className="absolute pointer-events-none"
+                        style={{
+                          left: `${hole.x}%`,
+                          top: `${hole.y}%`,
+                          animation: `holeExpand 0.6s ease-out forwards`,
+                        }}
+                      >
+                        <div className="w-6 h-6 md:w-12 md:h-12 border-2 border-red-600 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.6)]" />
+                        <div className="absolute inset-0 w-6 h-6 md:w-12 md:h-12 bg-red-600/20 rounded-full blur-md" />
+                      </div>
+                    ))}
                   </div>
                 </>
               ) : (
-                <div className="w-full max-w-[120px] md:max-w-[320px] relative captured-ui min-h-[140px]">
+                <div className="w-full md:max-w-[320px] relative captured-ui min-h-[140px]">
                   <form
                     onSubmit={handleFormSubmit}
                     className="border border-green-600/30 bg-black flex flex-col p-3 md:p-6 space-y-2 md:space-y-4 relative"
@@ -902,35 +947,37 @@ const Hero = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-1.5 md:space-y-3 relative z-10">
-                      <div className="space-y-1">
+                    <div className="flex flex-col space-y-1 md:space-y-3 relative z-10">
+                      <div className="space-y-0.5 md:space-y-1">
                         <label
                           style={pixelFont}
-                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase"
+                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase hidden md:block"
                         >
                           Name
                         </label>
                         <input
                           type="text"
                           required
+                          placeholder="Name"
                           value={formState.name}
                           onChange={(e) =>
                             setFormState({ ...formState, name: e.target.value })
                           }
-                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-1 md:py-2 text-[6px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors"
+                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
                         />
                       </div>
 
-                      <div className="space-y-1">
+                      <div className="space-y-0.5 md:space-y-1">
                         <label
                           style={pixelFont}
-                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase"
+                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase hidden md:block"
                         >
                           Email_ID
                         </label>
                         <input
                           type="email"
                           required
+                          placeholder="Email_ID"
                           value={formState.email}
                           onChange={(e) =>
                             setFormState({
@@ -938,19 +985,20 @@ const Hero = () => {
                               email: e.target.value,
                             })
                           }
-                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-1 md:py-2 text-[6px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors"
+                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
                         />
                       </div>
 
-                      <div className="space-y-1 flex flex-col">
+                      <div className="space-y-0.5 md:space-y-1 flex flex-col">
                         <label
                           style={pixelFont}
-                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase"
+                          className="text-[4px] md:text-[6px] text-zinc-500 block uppercase hidden md:block"
                         >
                           Message_Data
                         </label>
                         <textarea
                           required
+                          placeholder="Message_Data"
                           value={formState.message}
                           onChange={(e) =>
                             setFormState({
@@ -958,7 +1006,7 @@ const Hero = () => {
                               message: e.target.value,
                             })
                           }
-                          className="w-full min-h-[40px] md:min-h-[80px] bg-zinc-900/50 border border-zinc-800 px-2 py-1 text-[6px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors resize-none"
+                          className="w-full min-h-[30px] md:min-h-[80px] bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-1 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors resize-none placeholder:text-zinc-600"
                         />
                       </div>
                     </div>

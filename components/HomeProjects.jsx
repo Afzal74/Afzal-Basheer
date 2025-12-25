@@ -1,11 +1,8 @@
 'use client'
 
-import { useRef, useState, useEffect, useLayoutEffect } from 'react'
-import { gsap } from 'gsap'
-import { Terminal, ArrowRight, ShieldCheck, ExternalLink, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
-import { playSound, preloadSounds } from './useSoundEffects'
-import SoundLink from './SoundLink'
+import { useRef, useState, useEffect } from 'react'
+import { Terminal, ArrowRight, ShieldCheck, ExternalLink } from 'lucide-react'
+import { playSound } from './useSoundEffects'
 
 const projects = [
   {
@@ -47,23 +44,12 @@ const projects = [
 const pixelFont = { fontFamily: '"Press Start 2P", cursive' }
 const appleFont = { fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif' }
 
-const Projects = () => {
-  const containerRef = useRef(null)
-  const navRef = useRef(null)
+const HomeProjects = () => {
   const imageContainerRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [mounted, setMounted] = useState(false)
   const [carouselIndex, setCarouselIndex] = useState(0)
 
   useEffect(() => {
-    setMounted(true)
-    preloadSounds()
-  }, [])
-
-  // Carousel effect for projects with carousel images
-  useEffect(() => {
-    if (!mounted) return
-    
     const currentProject = projects[activeIndex]
     if (!currentProject.carouselImages) return
 
@@ -72,131 +58,24 @@ const Projects = () => {
     }, 2500)
 
     return () => clearInterval(interval)
-  }, [activeIndex, mounted])
-
-  useLayoutEffect(() => {
-    if (!mounted) return
-
-    // Check if animations already played this session
-    const hasAnimated = sessionStorage.getItem('projectsAnimated')
-    
-    if (hasAnimated) {
-      // Skip animations, just show everything
-      gsap.set(navRef.current, { opacity: 1, y: 0 })
-      gsap.set('.projects-header', { opacity: 1, y: 0 })
-      gsap.set('.project-card', { opacity: 1, x: 0 })
-      gsap.set('.project-preview', { opacity: 1, scale: 1 })
-      // Still run border animations
-      gsap.to('.project-border-top', {
-        left: '100%',
-        duration: 3,
-        repeat: -1,
-        ease: 'none',
-      })
-      gsap.to('.project-border-right', {
-        top: '100%',
-        duration: 3,
-        repeat: -1,
-        ease: 'none',
-        delay: 0.75,
-      })
-      gsap.to('.project-border-bottom', {
-        right: '100%',
-        duration: 3,
-        repeat: -1,
-        ease: 'none',
-        delay: 1.5,
-      })
-      gsap.to('.project-border-left', {
-        bottom: '100%',
-        duration: 3,
-        repeat: -1,
-        ease: 'none',
-        delay: 2.25,
-      })
-      return
-    }
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
-
-      tl.fromTo(navRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 })
-      tl.fromTo('.projects-header', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.4')
-      tl.fromTo('.project-card', { opacity: 0, x: 50 }, { opacity: 1, x: 0, duration: 0.6, stagger: 0.15 }, '-=0.4')
-      tl.fromTo('.project-preview', { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 1 }, '-=0.8')
-      
-      // Mark animations as complete
-      sessionStorage.setItem('projectsAnimated', 'true')
-    }, containerRef)
-
-    // Red border animation - outside context
-    gsap.to('.project-border-top', {
-      left: '100%',
-      duration: 3,
-      repeat: -1,
-      ease: 'none',
-    })
-    gsap.to('.project-border-right', {
-      top: '100%',
-      duration: 3,
-      repeat: -1,
-      ease: 'none',
-      delay: 0.75,
-    })
-    gsap.to('.project-border-bottom', {
-      right: '100%',
-      duration: 3,
-      repeat: -1,
-      ease: 'none',
-      delay: 1.5,
-    })
-    gsap.to('.project-border-left', {
-      bottom: '100%',
-      duration: 3,
-      repeat: -1,
-      ease: 'none',
-      delay: 2.25,
-    })
-
-    return () => ctx.revert()
-  }, [mounted])
+  }, [activeIndex])
 
   return (
-    <div ref={containerRef} className="bg-[#050505] min-h-screen text-white">
-      {/* Navigation */}
-      <nav ref={navRef} className="w-full fixed top-0 left-0 z-[100] px-4 md:px-12 py-6 flex items-center justify-between backdrop-blur-sm bg-black/20 opacity-0">
-        <SoundLink href="/" style={pixelFont} className="text-[10px] md:text-xs tracking-tighter text-white flex items-center gap-2 hover:text-red-500 transition-colors">
-          <ArrowLeft size={14} /> AFZAL<span className="text-red-600">.SYS</span>
-        </SoundLink>
-        <div className="flex items-center gap-4 md:gap-8">
-          {[
-            { name: 'Home', href: '/' },
-            { name: 'Projects', href: '/projects' },
-            { name: 'Achievements', href: '/achievements' }
-          ].map((item) => (
-            <SoundLink key={item.name} href={item.href} style={pixelFont} className={`nav-item text-[6px] md:text-[9px] uppercase tracking-widest transition-colors duration-300 relative group ${item.name === 'Projects' ? 'text-red-500' : 'text-zinc-500 hover:text-red-500'}`}>
-              {item.name}
-              <span className={`absolute -bottom-1 left-0 h-[1px] bg-red-600 transition-all duration-300 ${item.name === 'Projects' ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-            </SoundLink>
-          ))}
-        </div>
-      </nav>
-
-      <section id="projects" className="min-h-screen pt-16 md:pt-32 pb-10 md:pb-20">
-        <div className="container mx-auto px-4 md:px-12 lg:px-24">
-        <div className="projects-header mb-6 md:mb-16">
+    <section className="hidden md:hidden py-6 md:py-20 relative z-10">
+      <div className="px-4 md:px-12 lg:px-24">
+        <div className="mb-4 md:mb-16">
           <div
             style={pixelFont}
-            className="text-zinc-600 text-[8px] md:text-[10px] tracking-widest mb-2 md:mb-4 uppercase flex items-center gap-2"
+            className="text-zinc-600 text-[7px] md:text-[10px] tracking-widest mb-2 md:mb-4 uppercase flex items-center gap-2"
           >
-            <Terminal size={12} className="md:w-[14px] md:h-[14px]" /> Mission_Archive / {projects.length} Files
+            <Terminal size={10} className="md:w-[14px] md:h-[14px]" /> Mission_Archive / {projects.length} Files
           </div>
-          <h2 style={appleFont} className="text-2xl md:text-4xl lg:text-5xl font-bold text-white">
+          <h2 style={appleFont} className="text-xl md:text-4xl lg:text-5xl font-bold text-white">
             Projects
           </h2>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 md:gap-12 items-start">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-12 items-start">
           {/* Project List */}
           <div className="w-full lg:w-1/2 space-y-1 md:space-y-4">
             {projects.map((proj, i) => (
@@ -245,16 +124,8 @@ const Projects = () => {
           </div>
 
           {/* Project Preview */}
-          <div className="w-full lg:w-1/2 project-preview lg:sticky lg:top-32 space-y-2 md:space-y-8">
+          <div className="w-full lg:w-1/2 space-y-2 md:space-y-8">
             <div ref={imageContainerRef} className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden">
-              {/* Red moving border */}
-              <div className="absolute inset-0 pointer-events-none z-20">
-                <div className="project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-              </div>
-              
               <img
                 src={projects[activeIndex].carouselImages ? projects[activeIndex].carouselImages[carouselIndex] : projects[activeIndex].img}
                 alt={projects[activeIndex].title}
@@ -287,10 +158,9 @@ const Projects = () => {
             </div>
           </div>
         </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   )
 }
 
-export default Projects
+export default HomeProjects

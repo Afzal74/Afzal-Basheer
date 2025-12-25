@@ -38,12 +38,12 @@ const LogoShowcase = () => {
 
   if (!mounted) {
     return (
-      <div className="relative -mt-[60vh] md:-mt-32 opacity-0 h-12 md:h-32" />
+      <div className="relative -mt-[70vh] md:-mt-32 opacity-0 h-12 md:h-32" />
     );
   }
 
   return (
-    <div ref={containerRef} className="relative -mt-[60vh] md:-mt-32 opacity-0">
+    <div ref={containerRef} className="relative -mt-[70vh] md:-mt-32 opacity-0 px-2.5 py-2.5">
       <div className="container mx-auto px-4 md:px-12 lg:px-24">
         <div className="relative overflow-hidden rounded-lg">
           <div className="gradient-edge" />
