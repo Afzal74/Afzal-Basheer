@@ -6,7 +6,7 @@ const fallbackSounds = {
   click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
   success: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
   navigate: 'https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3',
-  select: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3',
+  select: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
   typing: 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3',
 }
 
