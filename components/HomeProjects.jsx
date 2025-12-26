@@ -18,7 +18,7 @@ const projects = [
       '/gamified learning platform/Realtime quiz.jpg',
       '/gamified learning platform/Student Pov.png'
     ],
-    link: '#'
+    link: 'https://ignite-vidya.vercel.app'
   },
   {
     id: 'M-02',
@@ -30,7 +30,7 @@ const projects = [
       '/quizverse/quizverse1.jpg',
       '/quizverse/quizverse2.jpg'
     ],
-    link: '#'
+    link: 'https://trivia-quiz-sigma.vercel.app'
   },
   {
     id: 'M-03',
@@ -42,7 +42,7 @@ const projects = [
       '/vtu vault/vtuvault1.jpg',
       '/vtu vault/vtuvault2.jpg'
     ],
-    link: '#'
+    link: 'https://vtu-vault.vercel.app'
   }
 ]
 
