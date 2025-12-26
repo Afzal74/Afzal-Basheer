@@ -29,8 +29,8 @@ const projects = [
     desc: 'A trivia quiz app featuring multiple categories, multiplayer mode, and PWA support. Implemented multiplayer functionality, leaderboard system, and offline support for seamless user experience.',
     img: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=800',
     carouselImages: [
-      '/QuizVerse/quizverse1.jpg',
-      '/QuizVerse/quizverse2.jpg'
+      '/quizverse/quizverse1.jpg',
+      '/quizverse/quizverse2.jpg'
     ],
     link: '#'
   },
