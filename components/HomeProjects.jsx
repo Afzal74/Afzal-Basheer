@@ -27,17 +27,21 @@ const projects = [
     desc: 'A trivia quiz app featuring multiple categories, multiplayer mode, and PWA support. Implemented multiplayer functionality, leaderboard system, and offline support for seamless user experience.',
     img: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=800',
     carouselImages: [
-      '/QuizVerse/quizverse.jpg',
-      '/QuizVerse/Realtime.jpg'
+      '/QuizVerse/quizverse1.jpg',
+      '/QuizVerse/quizverse2.jpg'
     ],
     link: '#'
   },
   {
     id: 'M-03',
-    title: 'Autocorrect Tool',
-    tech: ['Java'],
-    desc: 'A Java package for easy integration of autocorrect features in applications. Imports a dictionary and suggests closely matching words based on user input for improved text accuracy.',
+    title: 'VTU Vault',
+    tech: ['Next.js', 'TypeScript'],
+    desc: 'A comprehensive academic companion app for VTU students featuring study materials, CGPA calculator, project ideas, AI chat assistant, and smart search across all sections.',
     img: 'https://images.unsplash.com/photo-1510511459019-5dee997ddfdf?q=80&w=800',
+    carouselImages: [
+      '/vtu vault/vtuvault1.jpg',
+      '/vtu vault/vtuvault2.jpg'
+    ],
     link: '#'
   }
 ]
