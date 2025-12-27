@@ -60,10 +60,39 @@ export default function Home() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [imageClicked, setImageClicked] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [splashComplete, setSplashComplete] = useState(false);
   const achievementsRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Check if splash already shown this session
+    const hasAnimated = sessionStorage.getItem("heroAnimated");
+    if (hasAnimated) {
+      setSplashComplete(true);
+    } else {
+      // Lock scroll during splash
+      document.body.style.overflow = 'hidden';
+      
+      // Wait for hero animation to complete, then reveal content
+      const timer = setTimeout(() => {
+        setSplashComplete(true);
+        document.body.style.overflow = 'auto';
+        if (contentRef.current) {
+          gsap.fromTo(
+            contentRef.current,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+          );
+        }
+      }, 4000); // Adjust timing based on your hero animation duration
+      
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = 'auto';
+      };
+    }
   }, []);
 
   // Animate achievements section on mobile
@@ -159,8 +188,15 @@ export default function Home() {
   return (
     <main className="bg-[#050505] min-h-screen">
       <Hero />
-      <LogoShowcase />
-      <HomeProjects />
+      
+      {/* Content revealed after splash */}
+      <div 
+        ref={contentRef}
+        style={{ opacity: splashComplete ? 1 : 0 }}
+        className="transition-opacity duration-500"
+      >
+        <LogoShowcase />
+        <HomeProjects />
 
       {/* Achievements section - only visible on mobile */}
       <div 
@@ -266,6 +302,7 @@ export default function Home() {
             {mobileAchievements[activeAchievement].desc}
           </p>
         </div>
+      </div>
       </div>
     </main>
   );

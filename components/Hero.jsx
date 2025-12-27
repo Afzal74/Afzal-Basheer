@@ -191,6 +191,7 @@ const Hero = () => {
       gsap.set(roleTextRef.current, { opacity: 1, x: 0 });
       gsap.set(".desc-line", { opacity: 1, x: 0 });
       gsap.set(".word", { opacity: 1, y: 0 });
+      gsap.set(".social-links", { opacity: 1, y: 0 });
       gsap.set(wantedRef.current, { opacity: 1, scale: 1 });
       gsap.set(".target-box", { opacity: 1, scale: 1 });
       gsap.set(".target-shard", { opacity: 1, scale: 1, rotation: 0 });
@@ -346,6 +347,14 @@ const Hero = () => {
           "-=0.3"
         );
       }
+
+      // Animate social links after description
+      mainTl.fromTo(
+        ".social-links",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        "-=0.2"
+      );
 
       mainTl.fromTo(
         wantedRef.current,
@@ -806,7 +815,7 @@ const Hero = () => {
                     ))}
                   </p>
                   {/* Social Links */}
-                  <div className="flex items-center gap-4 mt-3 md:mt-4">
+                  <div className="social-links flex items-center gap-4 mt-3 md:mt-4 opacity-0">
                     <a
                       href="https://www.linkedin.com/in/afzal-basheer-127878264/"
                       target="_blank"
