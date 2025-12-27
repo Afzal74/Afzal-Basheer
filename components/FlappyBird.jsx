@@ -6,7 +6,7 @@ import { playSound } from "./useSoundEffects";
 
 const FlappyBird = ({ onClose }) => {
   const canvasRef = useRef(null);
-  const [gameState, setGameState] = useState("username"); // username, ready, playing, gameover
+  const [gameState, setGameState] = useState("username"); // username, ready, countdown, playing, gameover
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [birdPos, setBirdPos] = useState({ x: 60, y: 130 });
@@ -14,6 +14,7 @@ const FlappyBird = ({ onClose }) => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const gameRef = useRef({
     bird: { x: 60, y: 130, velocity: 0, width: 35, height: 35 },
@@ -121,7 +122,8 @@ const FlappyBird = ({ onClose }) => {
   const jump = useCallback(() => {
     if (gameState === "ready") {
       playSound("click", 0.3);
-      setGameState("playing");
+      setCountdown(3);
+      setGameState("countdown");
       resetGame();
     } else if (gameState === "playing") {
       playGameSound("flap", 0.4, 50);
@@ -133,12 +135,29 @@ const FlappyBird = ({ onClose }) => {
     }
   }, [gameState, resetGame]);
 
+  // Countdown timer
+  useEffect(() => {
+    if (gameState !== "countdown") return;
+
+    if (countdown === 0) {
+      setGameState("playing");
+      return;
+    }
+
+    playSound("click", 0.3);
+    const timer = setTimeout(() => {
+      setCountdown((c) => c - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [gameState, countdown]);
+
   // Handle keyboard
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
-        if (gameState === "username") return;
+        if (gameState === "username" || gameState === "countdown") return;
         jump();
       }
     };
@@ -257,7 +276,7 @@ const FlappyBird = ({ onClose }) => {
     };
   }, [gameState, score, highScore]);
 
-  // Draw ready/gameover screens
+  // Draw ready/gameover/countdown screens
   useEffect(() => {
     if (gameState === "playing" || gameState === "username") return;
 
@@ -286,7 +305,12 @@ const FlappyBird = ({ onClose }) => {
     ctx.font = "14px 'Press Start 2P', monospace";
     ctx.textAlign = "center";
 
-    if (gameState === "ready") {
+    if (gameState === "countdown") {
+      ctx.fillText("GET READY!", canvas.width / 2, 80);
+      ctx.fillStyle = "#fff";
+      ctx.font = "48px 'Press Start 2P', monospace";
+      ctx.fillText(countdown.toString(), canvas.width / 2, canvas.height / 2 + 20);
+    } else if (gameState === "ready") {
       ctx.fillText("FLAPPY BIRD", canvas.width / 2, 50);
       ctx.fillStyle = "#666";
       ctx.font = "8px 'Press Start 2P', monospace";
@@ -305,10 +329,11 @@ const FlappyBird = ({ onClose }) => {
       ctx.font = "7px 'Press Start 2P', monospace";
       ctx.fillText("CLICK TO RETRY", canvas.width / 2, canvas.height / 2 + 60);
     }
-  }, [gameState, score, highScore, username]);
+  }, [gameState, score, highScore, username, countdown]);
 
-  const birdStyle = gameState === "playing" 
-    ? { left: `${(birdPos.x / 300) * 100}%`, top: `${(birdPos.y / 300) * 100}%` }
+  const birdStyle =
+    gameState === "playing"
+      ? { left: `${(birdPos.x / 300) * 100}%`, top: `${(birdPos.y / 300) * 100}%` }
     : { left: '50%', top: '45%', transform: 'translate(-50%, -50%)' };
 
   // Username input screen

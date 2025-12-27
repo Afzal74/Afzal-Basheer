@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import Hero from "@/components/Hero";
 import LogoShowcase from "@/components/LogoShowcase";
 import HomeProjects from "@/components/HomeProjects";
+import GeminiChat from "@/components/GeminiChat";
 import { Trophy } from "lucide-react";
 import { playSound } from "@/components/useSoundEffects";
 
@@ -188,6 +189,7 @@ export default function Home() {
   return (
     <main className="bg-[#050505] min-h-screen">
       <Hero />
+      <GeminiChat />
       
       {/* Content revealed after splash */}
       <div 
