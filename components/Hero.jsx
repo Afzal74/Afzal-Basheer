@@ -14,6 +14,7 @@ import emailjs from "@emailjs/browser";
 import { useAudio } from "./AudioProvider";
 import { playSound, preloadSounds } from "./useSoundEffects";
 import SoundLink from "./SoundLink";
+import FlappyBird from "./FlappyBird";
 
 // EmailJS configuration
 const EMAILJS_SERVICE_ID = "service_ivn6f7t";
@@ -83,8 +84,9 @@ const Hero = () => {
   });
   const [isSending, setIsSending] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showFlappyGame, setShowFlappyGame] = useState(false);
 
-  const roles = ["Web Developer", "Designer", "Vibe"];
+  const roles = ["Web Developer", "AI Engineer", "Designer", "Vibe"];
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
 
   // Glass shards - 4 triangular pieces meeting at center
@@ -691,13 +693,30 @@ const Hero = () => {
         ref={navRef}
         className="w-full fixed top-0 left-0 z-[100] px-4 md:px-12 py-3 md:py-6 flex items-center justify-between backdrop-blur-sm bg-black/20 opacity-0"
       >
-        <SoundLink
-          href="/"
-          style={pixelFont}
-          className="text-[10px] md:text-xs tracking-tighter text-white"
-        >
-          AFZAL<span className="text-red-600">.SYS</span>
-        </SoundLink>
+        <div className="flex items-center gap-3">
+          <SoundLink
+            href="/"
+            style={pixelFont}
+            className="text-[10px] md:text-xs tracking-tighter text-white"
+          >
+            AFZAL<span className="text-red-600">.SYS</span>
+          </SoundLink>
+          <button
+            onClick={() => {
+              playSound("click", 0.4);
+              setShowFlappyGame(true);
+            }}
+            className="group relative w-8 h-8 md:w-10 md:h-10 overflow-hidden"
+            title="Play Flappy Bird!"
+          >
+            <img
+              src="/Flappy bird/Bird.gif"
+              alt="Play Game"
+              className="w-[200%] h-[200%] object-contain hover:scale-110 transition-all cursor-pointer absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:brightness-50 group-hover:sepia group-hover:saturate-[10] group-hover:hue-rotate-[-50deg]"
+            />
+            <span style={pixelFont} className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[4px] text-red-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">PLAY!</span>
+          </button>
+        </div>
         <div className="flex items-center gap-4 md:gap-8">
           {[
             { name: "Home", href: "/" },
@@ -1118,6 +1137,14 @@ const Hero = () => {
           STRIKE_ENABLED
         </div>
       </div>
+
+      {/* Flappy Bird Game */}
+      {showFlappyGame && (
+        <FlappyBird onClose={() => {
+          playSound("click", 0.4);
+          setShowFlappyGame(false);
+        }} />
+      )}
     </div>
   );
 };

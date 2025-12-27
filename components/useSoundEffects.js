@@ -8,6 +8,10 @@ const fallbackSounds = {
   navigate: 'https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3',
   select: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
   typing: 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3',
+  // Game sounds
+  flap: 'https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3',
+  score: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3',
+  hit: 'https://assets.mixkit.co/active_storage/sfx/2001/2001-preview.mp3',
 }
 
 export const playSound = (soundName, volume = 0.3) => {
