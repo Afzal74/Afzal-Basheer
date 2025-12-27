@@ -215,11 +215,13 @@ User: ${userMessage}`;
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 left-4 z-50 w-10 h-10 bg-black/90 border border-red-500/50 rounded-lg
-                   flex items-center justify-center hover:bg-red-500/20 hover:border-red-500 transition-all"
+        className="fixed bottom-4 left-4 z-50 w-10 h-10 bg-black/90 border border-zinc-700 rounded-lg
+                   flex items-center justify-center hover:bg-red-500/20 hover:border-red-500 transition-all group"
         style={monoFont}
       >
-        <span className="text-red-400 text-sm">{isOpen ? "×" : ">"}</span>
+        <span className="text-zinc-500 group-hover:text-red-400 text-sm transition-colors">
+          {isOpen ? "×" : ">"}
+        </span>
       </button>
 
       {isOpen && (
