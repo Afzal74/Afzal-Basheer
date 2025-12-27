@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import LogoShowcase from "@/components/LogoShowcase";
 import HomeProjects from "@/components/HomeProjects";
 import GeminiChat from "@/components/GeminiChat";
+
 import { Trophy } from "lucide-react";
 import { playSound } from "@/components/useSoundEffects";
 

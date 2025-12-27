@@ -207,11 +207,12 @@ const Achievements = () => {
           <ArrowLeft size={14} /> AFZAL
           <span className="text-red-600">.SYS</span>
         </SoundLink>
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-3 md:gap-8">
           {[
-            { name: "Home", href: "/" },
+            { name: "Home", href: "/", hideOnMobile: true },
             { name: "Projects", href: "/projects" },
             { name: "Achievements", href: "/achievements" },
+            { name: "Rate Me", href: "/ratings" },
           ].map((item) => (
             <SoundLink
               key={item.name}
@@ -221,7 +222,7 @@ const Achievements = () => {
                 item.name === "Achievements"
                   ? "text-red-500"
                   : "text-zinc-500 hover:text-red-500"
-              }`}
+              } ${item.hideOnMobile ? "hidden md:block" : ""}`}
             >
               {item.name}
               <span

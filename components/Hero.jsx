@@ -717,17 +717,18 @@ const Hero = () => {
             <span style={pixelFont} className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[4px] text-red-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">PLAY!</span>
           </button>
         </div>
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-3 md:gap-8">
           {[
-            { name: "Home", href: "/" },
+            { name: "Home", href: "/", hideOnMobile: true },
             { name: "Projects", href: "/projects" },
             { name: "Achievements", href: "/achievements" },
+            { name: "Rate Me", href: "/ratings" },
           ].map((item) => (
             <SoundLink
               key={item.name}
               href={item.href}
               style={pixelFont}
-              className="nav-item text-[6px] md:text-[9px] uppercase tracking-widest text-zinc-500 hover:text-red-500 transition-colors duration-300 relative group"
+              className={`nav-item text-[6px] md:text-[9px] uppercase tracking-widest text-zinc-500 hover:text-red-500 transition-colors duration-300 relative group ${item.hideOnMobile ? "hidden md:block" : ""}`}
             >
               {item.name}
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-red-600 transition-all duration-300 group-hover:w-full" />
