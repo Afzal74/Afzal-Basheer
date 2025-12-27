@@ -299,6 +299,8 @@ const Projects = () => {
               <div className="flex gap-4">
                 <a
                   href={projects[activeIndex].link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={pixelFont}
                   className="flex items-center gap-2 md:gap-3 bg-white text-black px-3 md:px-6 py-2 md:py-4 text-[8px] md:text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition-all"
                 >
