@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { gsap } from "gsap";
 import { playSound } from "./useSoundEffects";
+import { useAudio } from "./AudioProvider";
 
 const GeminiChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,7 @@ const GeminiChat = () => {
   const terminalRef = useRef(null);
   const inputRef = useRef(null);
   const router = useRouter();
+  const { isPlaying, toggleAudio } = useAudio();
 
   const monoFont = {
     fontFamily: '"SF Mono", "Fira Code", "Monaco", monospace',
@@ -30,6 +32,11 @@ const GeminiChat = () => {
     "/skills": "React, Next.js, Tailwind, AI/ML, GSAP, TypeScript",
     "/about": "Afzal - Web Dev & AI Engineer building cool stuff!",
     "/clear": "CLEAR",
+    "/music": "MUSIC",
+    "/play": "PLAY",
+    "/pause": "PAUSE",
+    "/experience": "EXPERIENCE",
+    "/flappy": "FLAPPY",
   };
 
   const projectsList = [
@@ -46,13 +53,22 @@ const GeminiChat = () => {
     { name: "Open Source", desc: "Active contributor to OSS projects" },
   ];
 
+  const experienceList = [
+    { company: "Anvelos Softwares", role: "Web Developer Intern", period: "2024 - Present" },
+  ];
+
   const helpCommands = [
     { cmd: "/projects", desc: "View my projects" },
     { cmd: "/achievements", desc: "See my achievements" },
+    { cmd: "/experience", desc: "View my work experience" },
     { cmd: "/rateme", desc: "Rate my portfolio" },
     { cmd: "/contact", desc: "Get my contact info" },
     { cmd: "/skills", desc: "List my tech stack" },
     { cmd: "/about", desc: "Learn about me" },
+    { cmd: "/music", desc: "Toggle background music" },
+    { cmd: "/play", desc: "Play music" },
+    { cmd: "/pause", desc: "Pause music" },
+    { cmd: "/flappy", desc: "Flappy Bird leaderboard" },
     { cmd: "/clear", desc: "Clear terminal" },
   ];
 
@@ -233,6 +249,49 @@ User: ${userMessage}`;
         await typeLine("  • Help me improve by sharing your experience", "system");
         await typeLine("> Navigating to ratings...", "system");
         setTimeout(() => router.push("/ratings"), 1000);
+        return;
+      }
+      // Handle /experience - show work experience
+      if (response === "EXPERIENCE") {
+        await typeLine("> Work Experience:", "system");
+        for (const { company, role, period } of experienceList) {
+          await typeLine(`  • ${company}`, "system");
+          await typeLine(`    ${role} | ${period}`, "system");
+        }
+        return;
+      }
+      // Handle /music - toggle music
+      if (response === "MUSIC") {
+        toggleAudio();
+        const status = !isPlaying ? "Playing" : "Paused";
+        await typeLine(`> Music ${status} 🎵`, "system");
+        return;
+      }
+      // Handle /play - play music
+      if (response === "PLAY") {
+        if (!isPlaying) toggleAudio();
+        await typeLine("> Music playing 🎵", "system");
+        return;
+      }
+      // Handle /pause - pause music
+      if (response === "PAUSE") {
+        if (isPlaying) toggleAudio();
+        await typeLine("> Music paused ⏸️", "system");
+        return;
+      }
+      // Handle /flappy - show flappy bird leaderboard
+      if (response === "FLAPPY") {
+        await typeLine("> Flappy Bird Leaderboard 🐦", "system");
+        const scores = JSON.parse(localStorage.getItem("flappyHighScores") || "[]");
+        if (scores.length === 0) {
+          await typeLine("  No scores yet! Play the game first.", "system");
+          await typeLine("  Click the bird icon in the navbar.", "system");
+        } else {
+          const topScores = scores.slice(0, 5);
+          for (let i = 0; i < topScores.length; i++) {
+            await typeLine(`  ${i + 1}. Score: ${topScores[i]}`, "system");
+          }
+        }
         return;
       }
       // Handle /help specially to show formatted list
