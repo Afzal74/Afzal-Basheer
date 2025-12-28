@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { Trophy, ArrowRight, Medal, Award, ArrowLeft } from "lucide-react";
 import { playSound, preloadSounds } from "./useSoundEffects";
 import SoundLink from "./SoundLink";
+import GeminiChat from "./GeminiChat";
 
 const achievements = [
   {
@@ -427,6 +428,7 @@ const Achievements = () => {
           </div>
         </div>
       </section>
+      <GeminiChat />
     </div>
   );
 };

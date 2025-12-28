@@ -7,7 +7,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { Music, Volume2, Trophy } from "lucide-react";
+import { Music, Volume2 } from "lucide-react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 import emailjs from "@emailjs/browser";
@@ -15,6 +15,7 @@ import { useAudio } from "./AudioProvider";
 import { playSound, preloadSounds } from "./useSoundEffects";
 import SoundLink from "./SoundLink";
 import FlappyBird from "./FlappyBird";
+import GeminiChat from "./GeminiChat";
 
 // EmailJS configuration
 const EMAILJS_SERVICE_ID = "service_ivn6f7t";
@@ -877,7 +878,9 @@ const Hero = () => {
                     <span className="word inline opacity-0">smooth</span>{" "}
                     <span className="word inline opacity-0">animations.</span>
                     <br />
-                    <span className="word inline opacity-0">Experienced</span>{" "}
+                    <span className="word inline opacity-0">
+                      Experienced
+                    </span>{" "}
                     <span className="word inline opacity-0">at</span>{" "}
                     <a
                       href="https://www.anvelos.com"
@@ -1068,14 +1071,26 @@ const Hero = () => {
                   {/* Shoot the Imposter Card */}
                   <div className="mini-game-card w-full max-w-[120px] md:max-w-[320px] mx-auto mt-2 md:mt-3 opacity-0">
                     <div className="border border-zinc-800/50 bg-zinc-900/30 p-1.5 md:p-2 space-y-0.5">
-                      <div style={pixelFont} className="text-[4px] md:text-[6px] text-red-500 uppercase tracking-wider">
+                      <div
+                        style={pixelFont}
+                        className="text-[4px] md:text-[6px] text-red-500 uppercase tracking-wider"
+                      >
                         Mini Game
                       </div>
-                      <div style={appleFont} className="text-[6px] md:text-xs font-bold text-white">
+                      <div
+                        style={appleFont}
+                        className="text-[6px] md:text-xs font-bold text-white"
+                      >
                         Shoot the Imposter
                       </div>
-                      <p style={appleFont} className="text-[5px] md:text-[10px] text-zinc-500 leading-snug">
-                        Click image to <span className="text-white">hunt the imposter</span>. Reach <span className="text-white">$1M</span> to unlock contact!
+                      <p
+                        style={appleFont}
+                        className="text-[5px] md:text-[10px] text-zinc-500 leading-snug"
+                      >
+                        Click image to{" "}
+                        <span className="text-white">hunt the imposter</span>.
+                        Reach <span className="text-white">$1M</span> to unlock
+                        contact!
                       </p>
                     </div>
                   </div>
@@ -1241,6 +1256,9 @@ const Hero = () => {
           }}
         />
       )}
+
+      {/* Chatbot */}
+      <GeminiChat />
     </div>
   );
 };

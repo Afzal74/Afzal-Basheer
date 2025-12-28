@@ -1,6 +1,5 @@
 import './globals.css'
 import { AudioProvider } from '@/components/AudioProvider'
-import GeminiChat from '@/components/GeminiChat'
 
 export const metadata = {
   title: 'Afzal Basheer',
@@ -16,7 +15,6 @@ export default function RootLayout({ children }) {
       <body>
         <AudioProvider>
           {children}
-          <GeminiChat />
         </AudioProvider>
       </body>
     </html>

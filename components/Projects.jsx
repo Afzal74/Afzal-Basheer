@@ -5,6 +5,7 @@ import { gsap } from 'gsap'
 import { Terminal, ArrowRight, ShieldCheck, ExternalLink, ArrowLeft } from 'lucide-react'
 import { playSound, preloadSounds } from './useSoundEffects'
 import SoundLink from './SoundLink'
+import GeminiChat from './GeminiChat'
 
 const projects = [
   {
@@ -324,6 +325,7 @@ const Projects = () => {
         </div>
         </div>
       </section>
+      <GeminiChat />
     </div>
   )
 }
