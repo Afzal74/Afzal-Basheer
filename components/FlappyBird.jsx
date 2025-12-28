@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { gsap } from "gsap";
 import { supabase } from "@/lib/supabase";
 import { playSound } from "./useSoundEffects";
 
@@ -211,16 +212,46 @@ const FlappyBird = ({ onClose }) => {
       game.pipes.forEach((pipe) => {
         pipe.x -= game.pipeSpeed;
 
-        ctx.fillStyle = "#dc2626";
+        // Top building (pipe)
+        ctx.fillStyle = "#1a1a2e";
         ctx.fillRect(pipe.x, 0, game.pipeWidth, pipe.gapY);
-        ctx.strokeStyle = "#991b1b";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#0f0f1a";
+        ctx.lineWidth = 2;
         ctx.strokeRect(pipe.x, 0, game.pipeWidth, pipe.gapY);
+        
+        // Top building windows
+        const windowSize = 8;
+        const windowGap = 12;
+        const windowMargin = 6;
+        ctx.fillStyle = "#fbbf24";
+        for (let wy = windowMargin; wy < pipe.gapY - windowSize; wy += windowGap) {
+          for (let wx = windowMargin; wx < game.pipeWidth - windowSize; wx += windowGap) {
+            // Randomly light some windows
+            ctx.fillStyle = Math.random() > 0.3 ? "#fbbf24" : "#1f1f3a";
+            ctx.fillRect(pipe.x + wx, wy, windowSize - 2, windowSize - 2);
+          }
+        }
+        // Top building roof
+        ctx.fillStyle = "#dc2626";
+        ctx.fillRect(pipe.x - 3, pipe.gapY - 8, game.pipeWidth + 6, 8);
 
         const bottomPipeY = pipe.gapY + game.pipeGap;
-        ctx.fillStyle = "#dc2626";
+        // Bottom building (pipe)
+        ctx.fillStyle = "#1a1a2e";
         ctx.fillRect(pipe.x, bottomPipeY, game.pipeWidth, canvas.height - bottomPipeY);
+        ctx.strokeStyle = "#0f0f1a";
         ctx.strokeRect(pipe.x, bottomPipeY, game.pipeWidth, canvas.height - bottomPipeY);
+        
+        // Bottom building windows
+        for (let wy = bottomPipeY + windowMargin + 8; wy < canvas.height - windowSize; wy += windowGap) {
+          for (let wx = windowMargin; wx < game.pipeWidth - windowSize; wx += windowGap) {
+            ctx.fillStyle = Math.random() > 0.3 ? "#fbbf24" : "#1f1f3a";
+            ctx.fillRect(pipe.x + wx, wy, windowSize - 2, windowSize - 2);
+          }
+        }
+        // Bottom building base
+        ctx.fillStyle = "#dc2626";
+        ctx.fillRect(pipe.x - 3, bottomPipeY, game.pipeWidth + 6, 8);
 
         const birdRight = game.bird.x + game.bird.width - 5;
         const birdBottom = game.bird.y + game.bird.height - 5;
@@ -331,6 +362,37 @@ const FlappyBird = ({ onClose }) => {
     }
   }, [gameState, score, highScore, username, countdown]);
 
+  // Animated red border
+  useEffect(() => {
+    gsap.to(".game-border-top", {
+      left: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+    });
+    gsap.to(".game-border-right", {
+      top: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 0.5,
+    });
+    gsap.to(".game-border-bottom", {
+      right: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 1,
+    });
+    gsap.to(".game-border-left", {
+      bottom: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 1.5,
+    });
+  }, []);
+
   const birdStyle =
     gameState === "playing"
       ? { left: `${(birdPos.x / 300) * 100}%`, top: `${(birdPos.y / 300) * 100}%` }
@@ -417,6 +479,14 @@ const FlappyBird = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm">
       <div className="relative bg-zinc-900 border border-zinc-800 rounded-lg p-4 max-w-sm w-full mx-4">
+        {/* Red moving border on outer card */}
+        <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden rounded-lg">
+          <div className="game-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+          <div className="game-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+          <div className="game-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+          <div className="game-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+        </div>
+        
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-zinc-500 hover:text-red-500 transition-colors z-10"
@@ -433,6 +503,7 @@ const FlappyBird = ({ onClose }) => {
           </div>
         </div>
 
+        {/* Game canvas */}
         <div className="relative w-full aspect-square">
           <canvas
             ref={canvasRef}

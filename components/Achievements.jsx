@@ -12,7 +12,11 @@ const achievements = [
     title: "CodeCircuit Hackathon Finalist",
     year: "2024",
     tags: ["Top 50", "Outlier.ai"],
-    desc: "Selected in the top 50 out of 5,000+ participants at CodeCircuit Hackathon. Developed a Trivia Quiz Web App with interactive features and real-time scoring. Awarded a paid freelance opportunity at Outlier.ai, $50 Jam credits, and 3 months of Vimcal premium subscription.",
+    desc: (
+      <>
+        Selected in the <span className="text-white font-medium">top 50</span> out of <span className="text-white font-medium">5,000+ participants</span> at CodeCircuit Hackathon. Developed a <span className="text-white font-medium">Trivia Quiz Web App</span> with interactive features and real-time scoring. Awarded a <span className="text-white font-medium">paid freelance opportunity</span> at Outlier.ai.
+      </>
+    ),
     img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800",
     carouselImages: ["/Achievements/codecircuit/CodeCircuit.jpg"],
     stat: "Top 50/5K+",
@@ -22,7 +26,11 @@ const achievements = [
     title: "AI Meme Generator Competition Winner",
     year: "2024",
     tags: ["1st Place", "Epitome 2K24"],
-    desc: "Secured 1st place in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University, Mangaluru. Demonstrated creativity and innovation with an AI-powered meme generator.",
+    desc: (
+      <>
+        Secured <span className="text-white font-medium">1st place</span> in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University. Demonstrated <span className="text-white font-medium">creativity and innovation</span> with an <span className="text-white font-medium">AI-powered meme generator</span>.
+      </>
+    ),
     img: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800",
     carouselImages: [
       "/Achievements/Ai meme generator/Ai meme generator.jpg",
@@ -35,7 +43,11 @@ const achievements = [
     title: "Web Development Workshop Mentor",
     year: "2025",
     tags: ["Mentor", "HTML & CSS"],
-    desc: "Conducted a full-day HTML & CSS workshop for junior developers on March 22, 2025. Received excellent feedback and strong engagement from participants, helping the next generation of developers.",
+    desc: (
+      <>
+        Conducted a <span className="text-white font-medium">full-day HTML & CSS workshop</span> for junior developers. Received <span className="text-white font-medium">excellent feedback</span> and <span className="text-white font-medium">strong engagement</span> from participants, helping the next generation of developers.
+      </>
+    ),
     img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800",
     carouselImages: [
       "/Achievements/web development workshop/The workshop.jpg",

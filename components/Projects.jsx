@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect, useLayoutEffect } from 'react'
 import { gsap } from 'gsap'
 import { Terminal, ArrowRight, ShieldCheck, ExternalLink, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
 import { playSound, preloadSounds } from './useSoundEffects'
 import SoundLink from './SoundLink'
 
@@ -12,7 +11,11 @@ const projects = [
     id: 'M-01',
     title: 'Gamified Learning Platform',
     tech: ['React.js', 'Node.js', 'MongoDB', 'Supabase', 'Tailwind CSS'],
-    desc: 'A gamified web platform designed to improve learning outcomes in rural schools through engagement and accessibility. Features interactive quizzes, reward-based challenges, real-time progress tracking, and personalized learning paths for students.',
+    desc: (
+      <>
+        A <span className="text-white font-medium">gamified web platform</span> designed to improve learning outcomes in <span className="text-white font-medium">rural schools</span>. Features <span className="text-white font-medium">interactive quizzes</span>, reward-based challenges, <span className="text-white font-medium">real-time progress tracking</span>, and personalized learning paths.
+      </>
+    ),
     img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800',
     carouselImages: [
       '/gamified learning platform/Home.jpg',
@@ -26,7 +29,11 @@ const projects = [
     id: 'M-02',
     title: 'QuizVerse',
     tech: ['Next.js', 'Tailwind CSS', 'Firebase', 'Zustand', 'TypeScript'],
-    desc: 'A trivia quiz app featuring multiple categories, multiplayer mode, and PWA support. Implemented multiplayer functionality, leaderboard system, and offline support for seamless user experience.',
+    desc: (
+      <>
+        A <span className="text-white font-medium">trivia quiz app</span> featuring multiple categories, <span className="text-white font-medium">multiplayer mode</span>, and <span className="text-white font-medium">PWA support</span>. Implemented <span className="text-white font-medium">leaderboard system</span> and <span className="text-white font-medium">offline support</span> for seamless user experience.
+      </>
+    ),
     img: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=800',
     carouselImages: [
       '/quizverse/quizverse1.jpg',
@@ -38,7 +45,11 @@ const projects = [
     id: 'M-03',
     title: 'VTU Vault',
     tech: ['Next.js', 'TypeScript'],
-    desc: 'A comprehensive academic companion app for VTU students featuring study materials, CGPA calculator, project ideas, AI chat assistant, and smart search across all sections.',
+    desc: (
+      <>
+        A comprehensive <span className="text-white font-medium">academic companion app</span> for VTU students featuring <span className="text-white font-medium">study materials</span>, <span className="text-white font-medium">CGPA calculator</span>, project ideas, <span className="text-white font-medium">AI chat assistant</span>, and smart search.
+      </>
+    ),
     img: 'https://images.unsplash.com/photo-1510511459019-5dee997ddfdf?q=80&w=800',
     carouselImages: [
       '/vtu vault/vtuvault1.jpg',
