@@ -44,6 +44,7 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState(false);
+  const [nameError, setNameError] = useState(false);
   const [localName, setLocalName] = useState(card.name || "");
   const [localMessage, setLocalMessage] = useState(card.message || "");
   const [cardWidth, setCardWidth] = useState(200);
@@ -130,6 +131,23 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
   }, [isDragging, dragOffset, card, onUpdate, isPasted, cardWidth]);
 
   const handlePaste = () => {
+    if (!localName.trim()) {
+      playSound("click", 0.2);
+      setNameError(true);
+      setTimeout(() => setNameError(false), 2000);
+      // Shake the card to indicate error
+      if (cardRef.current) {
+        gsap.to(cardRef.current, {
+          x: "+=5",
+          duration: 0.05,
+          repeat: 5,
+          yoyo: true,
+          ease: "power2.inOut",
+          onComplete: () => gsap.set(cardRef.current, { x: 0 })
+        });
+      }
+      return;
+    }
     playSound("click", 0.4);
     onUpdate({ ...card, pasted: true });
   };
@@ -256,10 +274,10 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
           <input
             type="text"
             value={localName}
-            onChange={(e) => { if (isPasted) return; setLocalName(e.target.value); onUpdate({ ...card, name: e.target.value }); }}
-            placeholder="Your name..."
+            onChange={(e) => { if (isPasted) return; setLocalName(e.target.value); setNameError(false); onUpdate({ ...card, name: e.target.value }); }}
+            placeholder={nameError ? "Name required!" : "Your name..."}
             readOnly={isPasted}
-            className="no-drag w-full bg-transparent border-none outline-none text-gray-800 text-sm sm:text-base font-bold placeholder:text-gray-400 placeholder:font-normal cursor-text"
+            className={`no-drag w-full bg-transparent border-none outline-none text-sm sm:text-base font-bold placeholder:font-normal cursor-text ${nameError ? "text-red-500 placeholder:text-red-400" : "text-gray-800 placeholder:text-gray-400"}`}
             style={{ fontFamily: "'Caveat', cursive" }}
           />
 

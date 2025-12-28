@@ -261,26 +261,17 @@ export default function RatingsPage() {
             </div>
           )}
 
-          {/* Empty State - only on desktop or when no cards */}
-          {!loading && pastedCards.length === 0 && !isMobile && (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-              <div className="text-6xl mb-6 opacity-30">⭐</div>
-              <h3 style={appleFont} className="text-xl md:text-2xl text-zinc-400 mb-2">No ratings yet</h3>
-              <p style={pixelFont} className="text-[8px] md:text-[10px] text-zinc-600">{">"} Click the button to add your rating</p>
-            </div>
-          )}
-
-          {/* Mobile Grid Layout for Pasted Cards - inside container */}
-          {isMobile && !loading && (
+          {/* Grid Layout for Pasted Cards */}
+          {!loading && (
             <>
               {pastedCards.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="text-4xl mb-4 opacity-30">⭐</div>
-                  <h3 style={appleFont} className="text-lg text-zinc-400 mb-1">No ratings yet</h3>
-                  <p style={pixelFont} className="text-[7px] text-zinc-600">Tap ADD to rate</p>
+                <div className="flex flex-col items-center justify-center min-h-[50vh] md:min-h-[40vh] py-16 text-center">
+                  <div className="text-4xl md:text-6xl mb-4 md:mb-6 opacity-30">⭐</div>
+                  <h3 style={appleFont} className="text-lg md:text-2xl text-zinc-400 mb-1 md:mb-2">No ratings yet</h3>
+                  <p style={pixelFont} className="text-[7px] md:text-[10px] text-zinc-600">{isMobile ? "Tap ADD to rate" : "> Click the button to add your rating"}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 pb-20">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 pb-20">
                   {pastedCards.map((card, index) => (
                     <RatingCard 
                       key={card.id} 
@@ -308,8 +299,8 @@ export default function RatingsPage() {
         <span className="text-[8px] md:text-[10px]">ADD</span>
       </button>
 
-      {/* Desktop: Fixed position cards / Mobile: Only unpasted cards float */}
-      {cards.filter(c => isMobile ? !c.pasted : true).map((card) => (
+      {/* Floating cards - only unpasted cards float */}
+      {cards.filter(c => !c.pasted).map((card) => (
         <RatingCard 
           key={card.id} 
           card={card} 
