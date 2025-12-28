@@ -12,6 +12,9 @@ const fallbackSounds = {
   flap: 'https://assets.mixkit.co/active_storage/sfx/2073/2073-preview.mp3',
   score: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3',
   hit: 'https://assets.mixkit.co/active_storage/sfx/2001/2001-preview.mp3',
+  // Rating sounds
+  paste: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3',
+  error: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3',
 }
 
 export const playSound = (soundName, volume = 0.3) => {

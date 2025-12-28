@@ -132,7 +132,7 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
 
   const handlePaste = () => {
     if (!localName.trim()) {
-      playSound("click", 0.2);
+      playSound("error", 0.3);
       setNameError(true);
       setTimeout(() => setNameError(false), 2000);
       // Shake the card to indicate error
@@ -148,7 +148,7 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
       }
       return;
     }
-    playSound("click", 0.4);
+    playSound("paste", 0.5);
     onUpdate({ ...card, pasted: true });
   };
 
