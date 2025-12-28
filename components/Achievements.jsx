@@ -208,7 +208,7 @@ const Achievements = () => {
   }, [mounted]);
 
   return (
-    <div ref={containerRef} className="bg-[#050505] min-h-screen text-white">
+    <div ref={containerRef} className="bg-[#050505] min-h-screen lg:h-screen lg:overflow-hidden text-white">
       {/* Navigation */}
       <nav
         ref={navRef}
@@ -409,20 +409,6 @@ const Achievements = () => {
                 >
                   {achievements[activeIndex].desc}
                 </p>
-
-                {/* Progress bar decoration */}
-                <div className="space-y-1 md:space-y-2">
-                  <div
-                    className="flex justify-between text-[6px] md:text-[8px]"
-                    style={pixelFont}
-                  >
-                    <span className="text-zinc-600">COMPLETION</span>
-                    <span className="text-red-500">100%</span>
-                  </div>
-                  <div className="h-0.5 md:h-1 bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-red-600 to-red-400 w-full" />
-                  </div>
-                </div>
               </div>
             </div>
           </div>

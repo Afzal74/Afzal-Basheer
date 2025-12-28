@@ -189,7 +189,7 @@ const Projects = () => {
   }, [mounted])
 
   return (
-    <div ref={containerRef} className="bg-[#050505] min-h-screen text-white">
+    <div ref={containerRef} className="bg-[#050505] min-h-screen lg:h-screen lg:overflow-hidden text-white">
       {/* Navigation */}
       <nav ref={navRef} className="w-full fixed top-0 left-0 z-[100] px-4 md:px-12 py-6 flex items-center justify-between backdrop-blur-sm bg-black/20 opacity-0">
         <SoundLink href="/" style={pixelFont} className="text-[10px] md:text-xs tracking-tighter text-white flex items-center gap-2 hover:text-red-500 transition-colors">

@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* Base styles */
+html,
+body {
+  background-color: #050505;
+  min-height: 100vh;
+}
+
+/* Desktop zoom to 95% */
+@media (min-width: 1024px) {
+  html {
+    zoom: 0.95;
+  }
+}
+
+/* No-scroll pages - fit to viewport on desktop */
+@media (min-width: 1024px) {
+  .no-scroll-page {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
 /* Marquee Animation */
 .marquee {
   overflow: hidden;
