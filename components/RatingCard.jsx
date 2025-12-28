@@ -211,10 +211,10 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
         {/* Animated red border - same as Projects */}
         {isPasted && (
           <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-            <div className={`border-top-${card.id} absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_10px_rgba(239,68,68,0.8)]`} />
-            <div className={`border-right-${card.id} absolute top-[-100%] right-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_10px_rgba(239,68,68,0.8)]`} />
-            <div className={`border-bottom-${card.id} absolute bottom-0 right-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_10px_rgba(239,68,68,0.8)]`} />
-            <div className={`border-left-${card.id} absolute bottom-[-100%] left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_10px_rgba(239,68,68,0.8)]`} />
+            <div className={`border-top-${card.id} absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+            <div className={`border-right-${card.id} absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+            <div className={`border-bottom-${card.id} absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+            <div className={`border-left-${card.id} absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
           </div>
         )}
 
