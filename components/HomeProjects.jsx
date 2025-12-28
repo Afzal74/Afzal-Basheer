@@ -2,8 +2,8 @@
 
 import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { gsap } from "gsap";
-import { Terminal, ArrowRight, ShieldCheck, ExternalLink } from "lucide-react";
-import { playSound } from "./useSoundEffects";
+import { Terminal, ShieldCheck, ExternalLink } from "lucide-react";
+import { playSound, preloadSounds } from "./useSoundEffects";
 
 const projects = [
   {
@@ -47,23 +47,24 @@ const appleFont = {
 };
 
 const HomeProjects = () => {
-  const imageContainerRef = useRef(null);
   const containerRef = useRef(null);
+  const imageContainerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [carouselIndex, setCarouselIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const [imageClicked, setImageClicked] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    preloadSounds();
   }, []);
 
+  // Carousel effect for projects with carousel images
   useEffect(() => {
+    if (!mounted) return;
+
     const currentProject = projects[activeIndex];
     if (!currentProject.carouselImages) return;
-
-    // Reset carousel index when project changes
-    setCarouselIndex(0);
 
     const interval = setInterval(() => {
       setCarouselIndex(
@@ -72,7 +73,7 @@ const HomeProjects = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [activeIndex]);
+  }, [activeIndex, mounted]);
 
   // Reset grayscale on scroll
   useEffect(() => {
@@ -87,136 +88,83 @@ const HomeProjects = () => {
   useLayoutEffect(() => {
     if (!mounted) return;
 
-    // Check if animations already played this session
-    const hasAnimated = sessionStorage.getItem("heroAnimated");
-
-    if (hasAnimated) {
-      // Skip animation, just show it
-      gsap.set(containerRef.current, { opacity: 1, y: 0 });
-      // Still run border animations
-      gsap.to(".project-border-top", {
-        left: "100%",
-        duration: 3,
-        repeat: -1,
-        ease: "none",
-      });
-      gsap.to(".project-border-right", {
-        top: "100%",
-        duration: 3,
-        repeat: -1,
-        ease: "none",
-        delay: 0.75,
-      });
-      gsap.to(".project-border-bottom", {
-        right: "100%",
-        duration: 3,
-        repeat: -1,
-        ease: "none",
-        delay: 1.5,
-      });
-      gsap.to(".project-border-left", {
-        bottom: "100%",
-        duration: 3,
-        repeat: -1,
-        ease: "none",
-        delay: 2.25,
-      });
-      return;
-    }
-
-    // Delay to sync with Hero animation sequence
-    const timer = setTimeout(() => {
-      gsap.fromTo(
-        containerRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
-      );
-    }, 4000); // Appears after hero animations complete
-
-    // Red border animation
-    gsap.to(".project-border-top", {
+    // Start border animations
+    gsap.to(".home-project-border-top", {
       left: "100%",
       duration: 3,
       repeat: -1,
       ease: "none",
     });
-    gsap.to(".project-border-right", {
+    gsap.to(".home-project-border-right", {
       top: "100%",
       duration: 3,
       repeat: -1,
       ease: "none",
       delay: 0.75,
     });
-    gsap.to(".project-border-bottom", {
+    gsap.to(".home-project-border-bottom", {
       right: "100%",
       duration: 3,
       repeat: -1,
       ease: "none",
       delay: 1.5,
     });
-    gsap.to(".project-border-left", {
+    gsap.to(".home-project-border-left", {
       bottom: "100%",
       duration: 3,
       repeat: -1,
       ease: "none",
       delay: 2.25,
     });
-
-    return () => clearTimeout(timer);
   }, [mounted]);
 
   return (
     <section
-      className="block md:hidden py-6 relative z-10 opacity-0"
       ref={containerRef}
+      className="block md:hidden py-6 relative z-10 bg-[#050505]"
     >
-      <div className="px-4 md:px-12 lg:px-24">
-        <div className="mb-4 md:mb-16">
+      <div className="container mx-auto px-4">
+        <div className="home-projects-header mb-6">
           <div
             style={pixelFont}
-            className="text-zinc-600 text-[7px] md:text-[10px] tracking-widest mb-2 md:mb-4 uppercase flex items-center gap-2"
+            className="text-zinc-600 text-[8px] tracking-widest mb-2 uppercase flex items-center gap-2"
           >
-            <Terminal size={10} className="md:w-[14px] md:h-[14px]" />{" "}
-            Mission_Archive / {projects.length} Files
+            <Terminal size={12} /> Mission_Archive / {projects.length} Files
           </div>
           <h2
             style={appleFont}
-            className="text-xl md:text-4xl lg:text-5xl font-bold text-white"
+            className="text-2xl font-bold text-white"
           >
             Projects
           </h2>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-12 items-start">
+        <div className="flex flex-col gap-6 items-start">
           {/* Project List */}
-          <div className="w-full lg:w-1/2 space-y-1 md:space-y-4">
+          <div className="w-full space-y-1">
             {projects.map((proj, i) => (
               <div
                 key={proj.id}
                 onClick={() => {
                   playSound("select", 0.3);
                   setActiveIndex(i);
-                  setCarouselIndex(0);
                   setImageClicked(false);
                 }}
                 onMouseEnter={() => {
-                  if (mounted && activeIndex !== i) {
-                    playSound("select", 0.3);
-                    setActiveIndex(i);
-                    setCarouselIndex(0);
-                  }
+                  playSound("select", 0.3);
+                  setActiveIndex(i);
                 }}
-                className={`project-card p-2 md:p-6 border-l-4 transition-all duration-300 cursor-pointer ${
+                className={`home-project-card p-2 border-l-4 transition-all duration-300 cursor-pointer ${
                   activeIndex === i
                     ? "bg-zinc-900/40 border-red-600"
                     : "bg-transparent border-zinc-900 hover:border-zinc-700"
                 }`}
               >
                 <div className="flex justify-between items-center">
-                  <div className="space-y-0.5 md:space-y-2">
+                  <div className="space-y-0.5">
                     <div
                       style={pixelFont}
-                      className={`text-[5px] md:text-[8px] ${
+                      className={`text-[5px] ${
                         activeIndex === i ? "text-red-500" : "text-zinc-600"
                       }`}
                     >
@@ -224,37 +172,29 @@ const HomeProjects = () => {
                     </div>
                     <h3
                       style={appleFont}
-                      className="text-xs md:text-2xl font-black tracking-tighter uppercase text-white"
+                      className="text-xs font-black tracking-tighter uppercase text-white"
                     >
                       {proj.title}
                     </h3>
-                    <div className="flex gap-0.5 md:gap-2 flex-wrap">
+                    <div className="flex gap-0.5 flex-wrap">
                       {proj.tech.map((t) => (
                         <span
                           key={t}
                           style={pixelFont}
-                          className="text-[4px] md:text-[6px] bg-zinc-800 text-zinc-400 px-1 md:px-2 py-0.5 md:py-1"
+                          className="text-[4px] bg-zinc-800 text-zinc-400 px-1 py-0.5"
                         >
                           {t}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <ArrowRight
-                    size={16}
-                    className={`text-white transition-all duration-500 hidden md:block ${
-                      activeIndex === i
-                        ? "translate-x-0 opacity-100"
-                        : "-translate-x-4 opacity-0"
-                    }`}
-                  />
                 </div>
               </div>
             ))}
           </div>
 
           {/* Project Preview */}
-          <div className="w-full lg:w-1/2 space-y-2 md:space-y-8">
+          <div className="w-full home-project-preview space-y-2">
             <div
               ref={imageContainerRef}
               className="relative aspect-video border border-white/5 shadow-2xl bg-zinc-900 group overflow-hidden cursor-pointer"
@@ -262,10 +202,10 @@ const HomeProjects = () => {
             >
               {/* Red moving border */}
               <div className="absolute inset-0 pointer-events-none z-20">
-                <div className="project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
-                <div className="project-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="home-project-border-top absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="home-project-border-right absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="home-project-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+                <div className="home-project-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
               </div>
 
               <img
@@ -282,24 +222,23 @@ const HomeProjects = () => {
                 }`}
               />
               <div
-                className="absolute top-2 md:top-4 right-2 md:right-4 text-[6px] md:text-[8px] bg-black/80 p-1 md:p-2 border border-red-900/30 text-red-600"
+                className="absolute top-2 right-2 text-[6px] bg-black/80 p-1 border border-red-900/30 text-red-600"
                 style={pixelFont}
               >
                 STATUS: SECURE
               </div>
             </div>
 
-            <div className="space-y-2 md:space-y-6">
+            <div className="space-y-2">
               <div
                 style={pixelFont}
-                className="text-[8px] md:text-[10px] text-red-600 flex items-center gap-2"
+                className="text-[8px] text-red-600 flex items-center gap-2"
               >
-                <ShieldCheck size={12} className="md:w-[14px] md:h-[14px]" />{" "}
-                MISSION_BRIEF
+                <ShieldCheck size={12} /> MISSION_BRIEF
               </div>
               <p
                 style={appleFont}
-                className="text-zinc-400 text-xs md:text-lg font-light leading-relaxed"
+                className="text-zinc-400 text-xs font-light leading-relaxed"
               >
                 {projects[activeIndex].desc}
               </p>
@@ -309,10 +248,9 @@ const HomeProjects = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={pixelFont}
-                  className="flex items-center gap-2 md:gap-3 bg-white text-black px-3 md:px-6 py-2 md:py-4 text-[8px] md:text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition-all"
+                  className="flex items-center gap-2 bg-white text-black px-3 py-2 text-[8px] font-black uppercase hover:bg-red-600 hover:text-white transition-all"
                 >
-                  ACCESS_LINK{" "}
-                  <ExternalLink size={12} className="md:w-[14px] md:h-[14px]" />
+                  ACCESS_LINK <ExternalLink size={12} />
                 </a>
               </div>
             </div>
