@@ -185,12 +185,12 @@ const Projects = () => {
         </SoundLink>
         <div className="flex items-center gap-3 md:gap-8">
           {[
-            { name: 'Home', href: '/', hideOnMobile: true },
+            { name: 'Home', href: '/', hidden: true },
             { name: 'Projects', href: '/projects' },
             { name: 'Achievements', href: '/achievements' },
             { name: 'Rate Me', href: '/ratings' }
           ].map((item) => (
-            <SoundLink key={item.name} href={item.href} style={pixelFont} className={`nav-item text-[6px] md:text-[9px] uppercase tracking-widest transition-colors duration-300 relative group ${item.name === 'Projects' ? 'text-red-500' : 'text-zinc-500 hover:text-red-500'} ${item.hideOnMobile ? 'hidden md:block' : ''}`}>
+            <SoundLink key={item.name} href={item.href} style={pixelFont} className={`nav-item text-[6px] md:text-[9px] uppercase tracking-widest transition-colors duration-300 relative group ${item.name === 'Projects' ? 'text-red-500' : 'text-zinc-500 hover:text-red-500'} ${item.hidden ? 'hidden' : ''}`}>
               {item.name}
               <span className={`absolute -bottom-1 left-0 h-[1px] bg-red-600 transition-all duration-300 ${item.name === 'Projects' ? 'w-full' : 'w-0 group-hover:w-full'}`} />
             </SoundLink>

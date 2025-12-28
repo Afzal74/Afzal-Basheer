@@ -217,7 +217,7 @@ export default function RatingsPage() {
         </SoundLink>
         <div className="flex items-center gap-3 md:gap-8">
           {[
-            { name: "Home", href: "/", hideOnMobile: true },
+            { name: "Home", href: "/", hidden: true },
             { name: "Projects", href: "/projects" },
             { name: "Achievements", href: "/achievements" },
             { name: "Rate Me", href: "/ratings" },
@@ -230,7 +230,7 @@ export default function RatingsPage() {
                 item.name === "Rate Me"
                   ? "text-red-500"
                   : "text-zinc-500 hover:text-red-500"
-              } ${item.hideOnMobile ? "hidden md:block" : ""}`}
+              } ${item.hidden ? "hidden" : ""}`}
             >
               {item.name}
               <span
