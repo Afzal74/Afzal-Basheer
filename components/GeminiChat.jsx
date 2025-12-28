@@ -25,6 +25,7 @@ const GeminiChat = () => {
     "/help": "Available commands:",
     "/projects": "PROJECTS",
     "/achievements": "ACHIEVEMENTS",
+    "/rateme": "RATEME",
     "/contact": "Email: appuafzal777@gmail.com | GitHub: Afzal74",
     "/skills": "React, Next.js, Tailwind, AI/ML, GSAP, TypeScript",
     "/about": "Afzal - Web Dev & AI Engineer building cool stuff!",
@@ -48,6 +49,7 @@ const GeminiChat = () => {
   const helpCommands = [
     { cmd: "/projects", desc: "View my projects" },
     { cmd: "/achievements", desc: "See my achievements" },
+    { cmd: "/rateme", desc: "Rate my portfolio" },
     { cmd: "/contact", desc: "Get my contact info" },
     { cmd: "/skills", desc: "List my tech stack" },
     { cmd: "/about", desc: "Learn about me" },
@@ -190,6 +192,16 @@ User: ${userMessage}`;
         }
         await typeLine("> Navigating to achievements...", "system");
         setTimeout(() => router.push("/achievements"), 1000);
+        return;
+      }
+      // Handle /rateme - explain and navigate to ratings
+      if (response === "RATEME") {
+        await typeLine("> Rate My Portfolio!", "system");
+        await typeLine("  • Leave your feedback and rating", "system");
+        await typeLine("  • Add a sticky note with your thoughts", "system");
+        await typeLine("  • Help me improve by sharing your experience", "system");
+        await typeLine("> Navigating to ratings...", "system");
+        setTimeout(() => router.push("/ratings"), 1000);
         return;
       }
       // Handle /help specially to show formatted list

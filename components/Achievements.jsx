@@ -15,9 +15,7 @@ const achievements = [
     tags: ["Top 50", "Outlier.ai"],
     desc: "Selected in the top 50 out of 5,000+ participants at CodeCircuit Hackathon. Developed a Trivia Quiz Web App with interactive features and real-time scoring. Awarded a paid freelance opportunity at Outlier.ai, $50 Jam credits, and 3 months of Vimcal premium subscription.",
     img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800",
-    carouselImages: [
-      '/Achievements/codecircuit/CodeCircuit.jpg',
-    ],
+    carouselImages: ["/Achievements/codecircuit/CodeCircuit.jpg"],
     stat: "Top 50/5K+",
   },
   {
@@ -28,8 +26,8 @@ const achievements = [
     desc: "Secured 1st place in AI Meme Generator competition at Epitome-2k24, hosted by AIMIT, St. Aloysius University, Mangaluru. Demonstrated creativity and innovation with an AI-powered meme generator.",
     img: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800",
     carouselImages: [
-      '/Achievements/Ai meme generator/Ai meme generator.jpg',
-      '/Achievements/Ai meme generator/ai meme generator2.jpg',
+      "/Achievements/Ai meme generator/Ai meme generator.jpg",
+      "/Achievements/Ai meme generator/ai meme generator2.jpg",
     ],
     stat: "1st Place",
   },
@@ -41,8 +39,8 @@ const achievements = [
     desc: "Conducted a full-day HTML & CSS workshop for junior developers on March 22, 2025. Received excellent feedback and strong engagement from participants, helping the next generation of developers.",
     img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800",
     carouselImages: [
-      '/Achievements/web development workshop/The workshop.jpg',
-      '/Achievements/web development workshop/workshop 2.jpg',
+      "/Achievements/web development workshop/The workshop.jpg",
+      "/Achievements/web development workshop/workshop 2.jpg",
     ],
     stat: "Full Day",
   },
@@ -73,7 +71,9 @@ const Achievements = () => {
     if (!currentAchievement.carouselImages) return;
 
     const interval = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % currentAchievement.carouselImages.length);
+      setCarouselIndex(
+        (prev) => (prev + 1) % currentAchievement.carouselImages.length
+      );
     }, 2500);
 
     return () => clearInterval(interval);
@@ -85,8 +85,8 @@ const Achievements = () => {
       setImageClicked(false);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useLayoutEffect(() => {
@@ -328,7 +328,7 @@ const Achievements = () => {
 
             {/* Achievement Preview - Left side on desktop, bottom on mobile */}
             <div className="w-full lg:w-1/2 achievement-preview lg:sticky lg:top-32 space-y-2 md:space-y-8 order-1 lg:order-none">
-              <div 
+              <div
                 className="relative aspect-video border border-white/5 overflow-hidden shadow-2xl bg-zinc-900 group cursor-pointer"
                 onClick={() => setImageClicked(!imageClicked)}
               >
@@ -340,10 +340,16 @@ const Achievements = () => {
                   <div className="achievement-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
                 </div>
                 <img
-                  src={achievements[activeIndex].carouselImages ? achievements[activeIndex].carouselImages[carouselIndex] : achievements[activeIndex].img}
+                  src={
+                    achievements[activeIndex].carouselImages
+                      ? achievements[activeIndex].carouselImages[carouselIndex]
+                      : achievements[activeIndex].img
+                  }
                   alt={achievements[activeIndex].title}
                   className={`w-full h-full object-cover transition-all duration-1000 ${
-                    imageClicked ? 'grayscale-0 brightness-100' : 'grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100'
+                    imageClicked
+                      ? "grayscale-0 brightness-100"
+                      : "grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100"
                   }`}
                 />
                 {/* Stat badge */}
