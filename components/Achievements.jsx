@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import { Trophy, ArrowRight, Medal, Award, ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { playSound, preloadSounds } from "./useSoundEffects";
 import SoundLink from "./SoundLink";
 
@@ -69,6 +68,9 @@ const Achievements = () => {
   useEffect(() => {
     const currentAchievement = achievements[activeIndex];
     if (!currentAchievement.carouselImages) return;
+
+    // Reset carousel index when achievement changes
+    setCarouselIndex(0);
 
     const interval = setInterval(() => {
       setCarouselIndex(
@@ -265,11 +267,15 @@ const Achievements = () => {
                   onClick={() => {
                     playSound("select", 0.3);
                     setActiveIndex(i);
+                    setCarouselIndex(0);
                     setImageClicked(false);
                   }}
                   onMouseEnter={() => {
-                    playSound("select", 0.3);
-                    setActiveIndex(i);
+                    if (mounted && activeIndex !== i) {
+                      playSound("select", 0.3);
+                      setActiveIndex(i);
+                      setCarouselIndex(0);
+                    }
                   }}
                   className={`achievement-card p-2 md:p-5 border-r-4 transition-all duration-300 cursor-pointer ${
                     activeIndex === i
