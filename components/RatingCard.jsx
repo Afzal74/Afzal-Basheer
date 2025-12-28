@@ -130,11 +130,19 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
     };
   }, [isDragging, dragOffset, card, onUpdate, isPasted, cardWidth]);
 
+  const [ratingError, setRatingError] = useState(false);
+
   const handlePaste = () => {
-    if (!localName.trim()) {
+    if (!localName.trim() || card.rating === 0) {
       playSound("error", 0.3);
-      setNameError(true);
-      setTimeout(() => setNameError(false), 2000);
+      if (!localName.trim()) {
+        setNameError(true);
+        setTimeout(() => setNameError(false), 2000);
+      }
+      if (card.rating === 0) {
+        setRatingError(true);
+        setTimeout(() => setRatingError(false), 2000);
+      }
       // Shake the card to indicate error
       if (cardRef.current) {
         gsap.to(cardRef.current, {
@@ -198,8 +206,17 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       style={cardStyle}
-      className={`${isMobileGrid ? "" : (isPasted ? "cursor-default" : "cursor-grab")} ${isDragging ? "cursor-grabbing" : ""}`}
+      className={`group relative ${isMobileGrid ? "" : isPasted ? "cursor-default" : "cursor-grab"} ${isDragging ? "cursor-grabbing" : ""}`}
     >
+      {/* Animated red border - outside grayscale */}
+      {isPasted && (
+        <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
+          <div className={`border-top-${card.id} absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+          <div className={`border-right-${card.id} absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+          <div className={`border-bottom-${card.id} absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+          <div className={`border-left-${card.id} absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
+        </div>
+      )}
       <div
         ref={borderRef}
         className="relative bg-[#fef9e7] shadow-lg"
@@ -208,16 +225,6 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
           boxShadow: "3px 3px 10px rgba(0,0,0,0.3)",
         }}
       >
-        {/* Animated red border - same as Projects */}
-        {isPasted && (
-          <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-            <div className={`border-top-${card.id} absolute top-0 left-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
-            <div className={`border-right-${card.id} absolute top-[-100%] right-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
-            <div className={`border-bottom-${card.id} absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
-            <div className={`border-left-${card.id} absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,1)]`} />
-          </div>
-        )}
-
         {/* Paper lines */}
         <div className="absolute inset-0 opacity-15 pointer-events-none overflow-hidden">
           {[...Array(10)].map((_, i) => (
@@ -293,13 +300,14 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
           />
 
           {/* Stars */}
-          <div className="flex gap-0.5 my-1.5 sm:my-2">
+          <div className={`flex gap-0.5 my-1.5 sm:my-2 ${ratingError ? "animate-pulse" : ""}`}>
             {[1, 2, 3, 4, 5].map((star) => (
-              <button key={star} onClick={() => handleStarClick(star)} disabled={isPasted} className={`no-drag ${isPasted ? "" : "hover:scale-110"} transition-transform`}>
-                <Star size={14} className="sm:w-[18px] sm:h-[18px]" fill={star <= card.rating ? card.color : "transparent"} stroke={star <= card.rating ? card.color : "#d1d5db"} strokeWidth={2} />
+              <button key={star} onClick={() => { handleStarClick(star); setRatingError(false); }} disabled={isPasted} className={`no-drag ${isPasted ? "" : "hover:scale-110"} transition-transform`}>
+                <Star size={14} className="sm:w-[18px] sm:h-[18px]" fill={star <= card.rating ? card.color : "transparent"} stroke={star <= card.rating ? card.color : ratingError ? "#ef4444" : "#d1d5db"} strokeWidth={2} />
               </button>
             ))}
           </div>
+          {ratingError && <p className="text-red-500 text-[8px] -mt-1 mb-1" style={{ fontFamily: "'Caveat', cursive" }}>Please rate!</p>}
 
           {/* Colors */}
           {!isPasted && (
