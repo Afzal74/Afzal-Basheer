@@ -97,7 +97,38 @@ const GeminiChat = () => {
     }
   }, [isOpen, lines.length, typeLine]);
 
-  // Red border animation
+  // Button border animation - always running
+  useEffect(() => {
+    gsap.to(".btn-border-top", {
+      left: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+    });
+    gsap.to(".btn-border-right", {
+      top: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 0.5,
+    });
+    gsap.to(".btn-border-bottom", {
+      right: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 1,
+    });
+    gsap.to(".btn-border-left", {
+      bottom: "100%",
+      duration: 2,
+      repeat: -1,
+      ease: "none",
+      delay: 1.5,
+    });
+  }, []);
+
+  // Chat window border animation
   useEffect(() => {
     if (!isOpen) return;
     gsap.to(".chat-border-top", {
@@ -225,19 +256,31 @@ User: ${userMessage}`;
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 left-4 z-50 w-10 h-10 bg-black/90 border border-zinc-700 rounded-lg
-                   flex items-center justify-center hover:bg-red-500/20 hover:border-red-500 transition-all group"
-        style={monoFont}
-      >
-        <span className="text-zinc-500 group-hover:text-red-400 text-sm transition-colors">
-          {isOpen ? "×" : ">"}
-        </span>
-      </button>
+      <div className="fixed bottom-6 right-6 z-50">
+        {/* Animated border container */}
+        <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-lg">
+          {/* Red moving border - clips to rounded corners */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg z-20">
+            <div className="btn-border-top absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="btn-border-right absolute top-[-100%] right-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="btn-border-bottom absolute bottom-0 right-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+            <div className="btn-border-left absolute bottom-[-100%] left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
+          </div>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="relative w-full h-full bg-black border border-zinc-800/50 rounded-lg
+                       flex items-center justify-center transition-all"
+            style={monoFont}
+          >
+            <span className="text-zinc-500 text-lg md:text-xl">
+              {isOpen ? "×" : ">"}
+            </span>
+          </button>
+        </div>
+      </div>
 
       {isOpen && (
-        <div className="fixed bottom-20 left-4 z-40 w-80 sm:w-96 h-80 bg-black/95 rounded-lg overflow-hidden shadow-2xl shadow-red-500/10">
+        <div className="fixed bottom-24 right-6 z-40 w-80 sm:w-96 h-80 bg-black/95 rounded-lg overflow-hidden shadow-2xl shadow-red-500/10">
           <div className="chat-border-top absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 to-transparent" />
           <div className="chat-border-right absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-red-500 to-transparent" />
           <div className="chat-border-bottom absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-l from-red-500 to-transparent" />

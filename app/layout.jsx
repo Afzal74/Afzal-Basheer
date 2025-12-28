@@ -1,6 +1,6 @@
 import './globals.css'
 import { AudioProvider } from '@/components/AudioProvider'
-import MusicButton from '@/components/MusicButton'
+import GeminiChat from '@/components/GeminiChat'
 
 export const metadata = {
   title: 'Afzal Basheer',
@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
       <body>
         <AudioProvider>
           {children}
-          <MusicButton />
+          <GeminiChat />
         </AudioProvider>
       </body>
     </html>

@@ -197,6 +197,7 @@ const Hero = () => {
       gsap.set(wantedRef.current, { opacity: 1, scale: 1 });
       gsap.set(".target-box", { opacity: 1, scale: 1 });
       gsap.set(".target-shard", { opacity: 1, scale: 1, rotation: 0 });
+      gsap.set(".mini-game-card", { opacity: 1, y: 0 });
 
       // Traveling border animation
       gsap.to(".traveling-border", {
@@ -375,6 +376,14 @@ const Hero = () => {
         { scale: 0, opacity: 0, rotation: 15 },
         { scale: 1, opacity: 1, rotation: 0, duration: 1, stagger: 0.05 },
         "-=0.5"
+      );
+
+      // Animate mini game card after image
+      mainTl.fromTo(
+        ".mini-game-card",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6 },
+        "-=0.3"
       );
 
       // Traveling border animation
@@ -629,7 +638,10 @@ const Hero = () => {
       opacity: 0,
       duration: 0.5,
       onComplete: () => {
-        setImgUrl(getRandomImage());
+        // Keep afzal bounty image if we're at the final stage
+        if (newBounty < 875000) {
+          setImgUrl(getRandomImage());
+        }
         gsap.to(".target-shard", {
           x: 0,
           y: 0,
@@ -1051,6 +1063,21 @@ const Hero = () => {
                         <div className="absolute inset-0 w-6 h-6 md:w-12 md:h-12 bg-red-600/20 rounded-full blur-md" />
                       </div>
                     ))}
+                  </div>
+
+                  {/* Shoot the Imposter Card */}
+                  <div className="mini-game-card w-full max-w-[120px] md:max-w-[320px] mx-auto mt-2 md:mt-3 opacity-0">
+                    <div className="border border-zinc-800/50 bg-zinc-900/30 p-1.5 md:p-2 space-y-0.5">
+                      <div style={pixelFont} className="text-[4px] md:text-[6px] text-red-500 uppercase tracking-wider">
+                        Mini Game
+                      </div>
+                      <div style={appleFont} className="text-[6px] md:text-xs font-bold text-white">
+                        Shoot the Imposter
+                      </div>
+                      <p style={appleFont} className="text-[5px] md:text-[10px] text-zinc-500 leading-snug">
+                        Click image to <span className="text-white">hunt the imposter</span>. Reach <span className="text-white">$1M</span> to unlock contact!
+                      </p>
+                    </div>
                   </div>
                 </>
               ) : (
