@@ -62,6 +62,9 @@ const HomeProjects = () => {
     const currentProject = projects[activeIndex];
     if (!currentProject.carouselImages) return;
 
+    // Reset carousel index when project changes
+    setCarouselIndex(0);
+
     const interval = setInterval(() => {
       setCarouselIndex(
         (prev) => (prev + 1) % currentProject.carouselImages.length
@@ -193,11 +196,15 @@ const HomeProjects = () => {
                 onClick={() => {
                   playSound("select", 0.3);
                   setActiveIndex(i);
+                  setCarouselIndex(0);
                   setImageClicked(false);
                 }}
                 onMouseEnter={() => {
-                  playSound("select", 0.3);
-                  setActiveIndex(i);
+                  if (mounted && activeIndex !== i) {
+                    playSound("select", 0.3);
+                    setActiveIndex(i);
+                    setCarouselIndex(0);
+                  }
                 }}
                 className={`project-card p-2 md:p-6 border-l-4 transition-all duration-300 cursor-pointer ${
                   activeIndex === i
