@@ -258,7 +258,8 @@ export default function RatingCard({ card, onUpdate, onDelete, isMobileGrid, mob
         {/* Delete prompt */}
         {showDeletePrompt && (
           <div className="absolute inset-0 bg-black/85 z-30 flex flex-col items-center justify-center p-3 rounded">
-            <p className="text-white text-[10px] mb-2">Enter password</p>
+            <p className="text-white text-[10px] mb-1 text-center">Only Afzal can delete this!</p>
+            <p className="text-zinc-400 text-[8px] mb-2">Enter password</p>
             <input
               type="password"
               value={passwordInput}
