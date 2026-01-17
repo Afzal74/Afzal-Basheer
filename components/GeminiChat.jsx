@@ -54,7 +54,7 @@ const GeminiChat = () => {
   ];
 
   const experienceList = [
-    { company: "Anvelos Softwares", role: "Web Developer Intern", period: "2024 - Present" },
+    { company: "Anvelos Softwares", role: "Web Developer Intern", period: "2024" },
   ];
 
   const helpCommands = [
@@ -328,7 +328,7 @@ User: ${userMessage}`;
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="relative w-full h-full bg-black border border-zinc-800/50 rounded-lg
-                       flex items-center justify-center transition-all"
+                       flex items-center justify-center transition-all cursor-pointer"
             style={monoFont}
           >
             <span className="text-zinc-500 text-lg md:text-xl">
@@ -364,7 +364,7 @@ User: ${userMessage}`;
               />
             </div>
             <span
-              className="text-red-400 text-[10px] tracking-wide"
+              className="text-red-400 text-sm tracking-wide"
               style={monoFont}
             >
               afzal@terminal
@@ -387,7 +387,7 @@ User: ${userMessage}`;
             {lines.map((line, i) => (
               <div
                 key={i}
-                className={`text-[11px] leading-relaxed ${
+                className={`text-sm leading-relaxed ${
                   line.type === "user"
                     ? "text-green-400"
                     : line.type === "ai"
@@ -399,7 +399,7 @@ User: ${userMessage}`;
               </div>
             ))}
             {currentTypingText && (
-              <div className="text-[11px] text-red-400 leading-relaxed">
+              <div className="text-sm text-red-400 leading-relaxed">
                 {currentTypingText}
                 <span className="animate-pulse">▋</span>
               </div>
@@ -411,7 +411,7 @@ User: ${userMessage}`;
             className="absolute bottom-0 left-0 right-0 p-2 border-t border-red-500/30"
           >
             <div className="flex items-center gap-2">
-              <span className="text-red-400 text-[11px]" style={monoFont}>
+              <span className="text-red-400 text-sm" style={monoFont}>
                 $
               </span>
               <input
@@ -421,7 +421,7 @@ User: ${userMessage}`;
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isTyping || isLoading}
                 placeholder={isTyping ? "..." : "type here..."}
-                className="flex-1 bg-transparent text-green-400 text-[11px] outline-none placeholder-red-500/40"
+                className="flex-1 bg-transparent text-green-400 text-sm outline-none placeholder-red-500/40"
                 style={monoFont}
               />
             </div>

@@ -31,6 +31,10 @@ if (typeof window !== "undefined") {
 if (typeof document !== "undefined") {
   const style = document.createElement("style");
   style.textContent = `
+    ::selection {
+      background-color: #ef4444;
+      color: #ffffff;
+    }
     @keyframes floatUp {
       0% {
         opacity: 1;
@@ -71,6 +75,7 @@ const Hero = () => {
   const { isPlaying, toggleAudio: globalToggleAudio } = useAudio();
 
   const [bounty, setBounty] = useState(0);
+  const [clickCount, setClickCount] = useState(0);
   const [isShattered, setIsShattered] = useState(false);
   const [isCaptured, setIsCaptured] = useState(false);
   const [bountyPopups, setBountyPopups] = useState([]);
@@ -485,6 +490,12 @@ const Hero = () => {
 
   const handleSlash = () => {
     if (isShattered || isCaptured) return;
+    
+    // Limit to 4 clicks
+    if (clickCount >= 4) return;
+    
+    const newClickCount = clickCount + 1;
+    setClickCount(newClickCount);
 
     // Add hole at current hover position
     const holeId = Date.now();
@@ -530,22 +541,23 @@ const Hero = () => {
 
     setNeutralizedPosters((prev) => [...prev, posterData]);
 
-    const newBounty = bounty + 125000;
+    const newBounty = bounty + 250000;
     setBounty(newBounty);
 
     // Add bounty popup animation
     const popupId = Date.now();
-    setBountyPopups((prev) => [...prev, { id: popupId, amount: 125000 }]);
+    setBountyPopups((prev) => [...prev, { id: popupId, amount: 250000 }]);
     setTimeout(() => {
       setBountyPopups((prev) => prev.filter((p) => p.id !== popupId));
     }, 1500);
 
-    // Show final image one step before $1,000,000
-    if (newBounty >= 875000 && bounty < 875000) {
+    // On 3rd click, show afzal bounty.png IMMEDIATELY
+    if (newClickCount === 3) {
       setImgUrl("/actual image/afzal bounty.png");
     }
 
-    if (newBounty >= 1000000) {
+    // On 4th click, trigger capture
+    if (newClickCount === 4) {
       setIsCaptured(true);
 
       // Play victory/congratulations sound
@@ -639,8 +651,8 @@ const Hero = () => {
       opacity: 0,
       duration: 0.5,
       onComplete: () => {
-        // Keep afzal bounty image if we're at the final stage
-        if (newBounty < 875000) {
+        // Only randomize image on clicks 1-2, NOT on 3rd and 4th click
+        if (newClickCount < 3) {
           setImgUrl(getRandomImage());
         }
         gsap.to(".target-shard", {
@@ -658,9 +670,15 @@ const Hero = () => {
   };
 
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isSubmitting || isSending) return;
+    
+    setIsSubmitting(true);
     setIsSending(true);
     setFormStatus({ type: "", message: "" });
 
@@ -692,6 +710,7 @@ const Hero = () => {
       });
     } finally {
       setIsSending(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -704,7 +723,10 @@ const Hero = () => {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen w-full bg-[#050505] text-white flex flex-col items-center overflow-hidden cursor-crosshair selection:bg-red-500 relative"
+      className="min-h-screen w-full bg-[#050505] text-white flex flex-col items-center overflow-hidden cursor-auto selection:bg-red-500 selection:text-white relative"
+      style={{
+        "--tw-prose-code": "#ef4444",
+      }}
     >
       {/* BACKGROUND NEUTRALIZED POSTERS */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -829,7 +851,7 @@ const Hero = () => {
                   />
                   <button
                     onClick={toggleAudio}
-                    className="music-btn p-2 md:p-3 rounded-full bg-zinc-900/80 border border-zinc-800 hover:border-red-600 hover:bg-zinc-800 transition-all group/music active:scale-90 opacity-0"
+                    className="music-btn p-2 md:p-3 rounded-full bg-zinc-900/80 border border-zinc-800 hover:border-red-600 hover:bg-zinc-800 transition-all group/music active:scale-90 opacity-0 cursor-pointer"
                     title="Toggle Mission Audio"
                   >
                     {isPlaying ? (
@@ -865,23 +887,25 @@ const Hero = () => {
                     style={appleFont}
                     className="desc-line text-zinc-500 text-[8px] md:text-lg lg:text-xl max-w-[200px] md:max-w-lg leading-snug md:leading-relaxed font-light opacity-0"
                   >
-                    <span className="word inline opacity-0">Building</span>{" "}
-                    <span className="word inline opacity-0">modern</span>{" "}
-                    <span className="word inline opacity-0">web</span>{" "}
+                    <span className="word inline opacity-0 text-white">Full-stack</span>{" "}
+                    <span className="word inline opacity-0 text-white">developer</span>{" "}
+                    <span className="word inline opacity-0">(he/him)</span>{" "}
+                    <span className="word inline opacity-0">based</span>{" "}
+                    <span className="word inline opacity-0">in</span>{" "}
+                    <span className="word inline opacity-0 text-white">India.</span>{" "}
+                    <span className="word inline opacity-0">I</span>{" "}
+                    <span className="word inline opacity-0">craft</span>{" "}
+                    <span className="word inline opacity-0">interactive</span>{" "}
                     <span className="word inline opacity-0">experiences</span>{" "}
-                    <span className="word inline opacity-0">with</span>{" "}
-                    <span className="word inline opacity-0">clean</span>{" "}
-                    <span className="word inline opacity-0">code,</span>{" "}
-                    <span className="word inline opacity-0">creative</span>{" "}
-                    <span className="word inline opacity-0">design</span>{" "}
-                    <span className="word inline opacity-0">&</span>{" "}
-                    <span className="word inline opacity-0">smooth</span>{" "}
-                    <span className="word inline opacity-0">animations.</span>
+                    <span className="word inline opacity-0">that</span>{" "}
+                    <span className="word inline opacity-0">are</span>{" "}
+                    <span className="word inline opacity-0">functional</span>{" "}
+                    <span className="word inline opacity-0">and</span>{" "}
+                    <span className="word inline opacity-0">delightful.</span>
                     <br />
                     <span className="word inline opacity-0">
-                      Experienced
+                      Experienced at
                     </span>{" "}
-                    <span className="word inline opacity-0">at</span>{" "}
                     <a
                       href="https://www.anvelos.com"
                       target="_blank"
@@ -1154,7 +1178,7 @@ const Hero = () => {
                           onChange={(e) =>
                             setFormState({ ...formState, name: e.target.value })
                           }
-                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
+                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[6px] md:text-xs focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
                         />
                       </div>
 
@@ -1176,7 +1200,7 @@ const Hero = () => {
                               email: e.target.value,
                             })
                           }
-                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
+                          className="w-full bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-2 text-[6px] md:text-xs focus:outline-none focus:border-green-600 transition-colors placeholder:text-zinc-600"
                         />
                       </div>
 
@@ -1197,7 +1221,7 @@ const Hero = () => {
                               message: e.target.value,
                             })
                           }
-                          className="w-full min-h-[30px] md:min-h-[80px] bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-1 text-[5px] md:text-[10px] focus:outline-none focus:border-green-600 transition-colors resize-none placeholder:text-zinc-600"
+                          className="w-full min-h-[30px] md:min-h-[80px] bg-zinc-900/50 border border-zinc-800 px-2 py-0.5 md:py-1 text-[6px] md:text-xs focus:outline-none focus:border-green-600 transition-colors resize-none placeholder:text-zinc-600"
                         />
                       </div>
                     </div>

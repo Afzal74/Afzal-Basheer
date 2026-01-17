@@ -19,6 +19,9 @@ export default function RatingsPage() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [userHasRating, setUserHasRating] = useState(false);
+  const [isAddingCard, setIsAddingCard] = useState(false);
   const navRef = useRef(null);
   const headerRef = useRef(null);
 
@@ -30,17 +33,33 @@ export default function RatingsPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Initialize user ID
+  useEffect(() => {
+    let id = localStorage.getItem("ratingUserId");
+    if (!id) {
+      id = "user_" + Date.now() + "_" + Math.random().toString(36).substring(2, 11);
+      localStorage.setItem("ratingUserId", id);
+    }
+    setUserId(id);
+  }, []);
+
   // Load cards from Supabase
   useEffect(() => {
     setMounted(true);
-    loadCards();
-  }, []);
+    if (userId) {
+      loadCards();
+    }
+  }, [userId]);
 
   const loadCards = async () => {
     if (!supabase) {
       // Fallback to localStorage if no Supabase
       const saved = localStorage.getItem("ratingCards");
-      if (saved) setCards(JSON.parse(saved));
+      if (saved) {
+        const loadedCards = JSON.parse(saved);
+        setCards(loadedCards);
+        checkUserRating(loadedCards);
+      }
       setLoading(false);
       return;
     }
@@ -49,47 +68,71 @@ export default function RatingsPage() {
       const { data, error } = await supabase
         .from("ratings")
         .select("*")
+        .eq("pasted", true)
         .order("created_at", { ascending: false });
 
       if (error) {
-        // Table might not exist yet - that's okay, just use empty array
-        if (
-          error.code === "42P01" ||
-          error.message?.includes("does not exist")
-        ) {
-          console.log("Ratings table not found - please create it in Supabase");
-          setCards([]);
-          setLoading(false);
-          return;
-        }
+        console.warn("Supabase query error:", error.message);
         throw error;
       }
 
       // Transform from DB format to card format
-      const loadedCards = (data || []).map((item) => ({
-        id: item.id,
-        name: item.name || "",
-        message: item.message || "",
-        rating: item.rating || 0,
-        color: item.color || "#ef4444",
-        width: item.width || 256,
-        x: item.x || 400,
-        y: item.y || 300,
-        rotation: item.rotation || 0,
-        date: item.date || "",
-        time: item.time || "",
-        pasted: item.pasted || false,
-        createdAt: item.created_at,
+      const loadedCards = (data || []).map((item) => {
+        const createdDate = new Date(item.created_at);
+        return {
+          id: item.id,
+          name: item.name || "",
+          message: item.message || "",
+          rating: item.rating || 0,
+          color: item.color || "#ef4444",
+          width: 256,
+          x: 400,
+          y: 300,
+          rotation: 0,
+          date: createdDate.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          }),
+          time: createdDate.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          pasted: item.pasted || false,
+          userId: item.user_id || null,
+          avatarUrl: null,
+          createdAt: item.created_at,
+        };
+      });
+
+      // Mark cards that belong to current user
+      const userRatingIds = JSON.parse(localStorage.getItem("userRatingIds") || "[]");
+      const cardsWithOwnership = loadedCards.map(card => ({
+        ...card,
+        userId: userRatingIds.includes(card.id) ? userId : null
       }));
 
-      setCards(loadedCards);
+      setCards(cardsWithOwnership);
+      checkUserRating(cardsWithOwnership);
     } catch (error) {
-      console.error("Error loading ratings:", error?.message || error);
+      console.error("Error loading ratings from Supabase:", error?.message || error);
       // Fallback to localStorage
       const saved = localStorage.getItem("ratingCards");
-      if (saved) setCards(JSON.parse(saved));
+      if (saved) {
+        const loadedCards = JSON.parse(saved);
+        setCards(loadedCards);
+        checkUserRating(loadedCards);
+      }
     }
     setLoading(false);
+  };
+
+  const checkUserRating = (cardsList) => {
+    if (!userId) return;
+    const hasRating = cardsList.some(
+      (card) => card.pasted && card.userId === userId
+    );
+    setUserHasRating(hasRating);
   };
 
   // Animate nav and header after mount
@@ -108,6 +151,15 @@ export default function RatingsPage() {
   }, [mounted]);
 
   const addCard = async () => {
+    // Check if user already has a rating or is adding, or has unpasted card
+    const hasUnpastedCard = cards.some(c => !c.pasted && c.userId === userId);
+    
+    if (userHasRating || isAddingCard || hasUnpastedCard) {
+      playSound("error", 0.3);
+      return;
+    }
+
+    setIsAddingCard(true);
     playSound("click", 0.4);
     const now = new Date();
     const isMobile = window.innerWidth < 640;
@@ -137,10 +189,12 @@ export default function RatingsPage() {
         minute: "2-digit",
       }),
       pasted: false,
+      userId: userId,
       createdAt: now.toISOString(),
     };
 
     setCards((prev) => [...prev, newCard]);
+    setIsAddingCard(false);
   };
 
   const updateCard = async (updatedCard) => {
@@ -151,31 +205,50 @@ export default function RatingsPage() {
     // Save to Supabase when card is pasted
     if (updatedCard.pasted && supabase) {
       try {
-        const { error } = await supabase.from("ratings").upsert({
+        // Track this rating as belonging to current user
+        const userRatingIds = JSON.parse(localStorage.getItem("userRatingIds") || "[]");
+        if (!userRatingIds.includes(updatedCard.id)) {
+          userRatingIds.push(updatedCard.id);
+          localStorage.setItem("userRatingIds", JSON.stringify(userRatingIds));
+        }
+
+        const payload = {
           id: updatedCard.id,
           name: updatedCard.name,
           message: updatedCard.message,
           rating: updatedCard.rating,
           color: updatedCard.color,
-          width: updatedCard.width,
-          x: updatedCard.x,
-          y: updatedCard.y,
-          rotation: updatedCard.rotation,
-          date: updatedCard.date,
-          time: updatedCard.time,
           pasted: updatedCard.pasted,
-          created_at: updatedCard.createdAt,
-        });
-        if (error) throw error;
+        };
+        
+        const { error } = await supabase.from("ratings").upsert(payload);
+        
+        if (error) {
+          console.error("Error saving rating:", error.message || error);
+          throw error;
+        }
+        setUserHasRating(true);
       } catch (error) {
-        console.error("Error saving rating:", error);
+        console.error("Failed to save rating to Supabase:", error?.message || error);
+        // Still mark as rated locally even if Supabase fails
+        setUserHasRating(true);
       }
     }
   };
 
   const deleteCard = async (id) => {
     playSound("click", 0.3);
+    const deletedCard = cards.find((c) => c.id === id);
     setCards((prev) => prev.filter((card) => card.id !== id));
+
+    // Remove from user's rating list
+    const userRatingIds = JSON.parse(localStorage.getItem("userRatingIds") || "[]");
+    const updatedIds = userRatingIds.filter(ratingId => ratingId !== id);
+    localStorage.setItem("userRatingIds", JSON.stringify(updatedIds));
+
+    if (deletedCard?.userId === userId) {
+      setUserHasRating(false);
+    }
 
     // Delete from Supabase
     if (supabase) {
@@ -312,6 +385,16 @@ export default function RatingsPage() {
                 </span>
               </div>
             </div>
+
+            {/* Description Section */}
+            <div className="mt-4 md:mt-6 p-2 md:p-3 bg-zinc-900/40 border border-zinc-800 rounded">
+              <p
+                style={appleFont}
+                className="text-xs md:text-sm text-zinc-400 leading-snug"
+              >
+                Please rate my work and provide feedback. Your thoughts help me improve.
+              </p>
+            </div>
           </div>
 
           {/* Loading State */}
@@ -369,14 +452,22 @@ export default function RatingsPage() {
       {/* Add Button - Floating */}
       <button
         onClick={addCard}
-        className="fixed bottom-6 right-4 md:bottom-8 md:right-6 z-[999] flex items-center gap-1.5 md:gap-2 px-3 py-2.5 md:px-4 md:py-3 bg-red-600 hover:bg-red-500 text-white transition-all hover:scale-105 group border border-red-500 shadow-lg shadow-red-500/30 rounded-sm"
+        disabled={userHasRating}
+        className={`fixed bottom-6 right-4 md:bottom-8 md:right-6 z-[999] flex items-center gap-1.5 md:gap-2 px-3 py-2.5 md:px-4 md:py-3 transition-all group border shadow-lg rounded-sm ${
+          userHasRating
+            ? "bg-zinc-700 border-zinc-600 text-zinc-400 cursor-not-allowed opacity-60"
+            : "bg-red-600 hover:bg-red-500 text-white hover:scale-105 border-red-500 shadow-red-500/30"
+        }`}
         style={pixelFont}
+        title={userHasRating ? "You've already added a rating" : "Add a new rating"}
       >
         <Plus
           size={18}
-          className="md:w-[20px] md:h-[20px] group-hover:rotate-90 transition-transform"
+          className={`md:w-[20px] md:h-[20px] ${!userHasRating && "group-hover:rotate-90"} transition-transform`}
         />
-        <span className="text-[8px] md:text-[10px]">ADD</span>
+        <span className="text-[8px] md:text-[10px]">
+          {userHasRating ? "RATED" : "ADD"}
+        </span>
       </button>
 
       {/* Floating cards - only unpasted cards float */}
