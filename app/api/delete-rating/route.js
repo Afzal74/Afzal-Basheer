@@ -2,36 +2,41 @@ import { supabase } from "@/lib/supabase";
 
 export async function POST(request) {
   try {
-    const { id } = await request.json();
+    const { id, userId } = await request.json();
 
-    if (!id || !supabase) {
+    if (!id || !userId || !supabase) {
       return new Response(
         JSON.stringify({ error: "Invalid request" }),
         { status: 400 }
       );
     }
 
-    // CRITICAL: Check if rating is pasted before allowing deletion
+    // Check if rating exists and verify ownership
     try {
       const { data: rating, error: queryError } = await supabase
         .from("ratings")
-        .select("id, pasted")
+        .select("id, pasted, user_id")
         .eq("id", id)
         .single();
 
-      // If rating exists and is pasted, prevent deletion
-      if (rating && rating.pasted) {
-        return new Response(
-          JSON.stringify({ error: "Cannot delete submitted ratings" }),
-          { status: 403 }
-        );
+      // If rating exists, verify the user owns it
+      if (rating) {
+        // Allow deletion only if:
+        // 1. User owns the rating (user_id matches)
+        // 2. OR rating is unpasted (draft)
+        if (rating.pasted && rating.user_id !== userId) {
+          return new Response(
+            JSON.stringify({ error: "Cannot delete someone else's rating" }),
+            { status: 403 }
+          );
+        }
       }
     } catch (err) {
       // If we can't find it, it's probably not in DB (unpasted card)
       // Allow deletion to proceed
     }
 
-    // Only delete unpasted cards from database
+    // Delete the rating
     const { error } = await supabase.from("ratings").delete().eq("id", id);
 
     if (error) {

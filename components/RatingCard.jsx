@@ -130,16 +130,22 @@ export default function RatingCard({
     setLocalName(card.name || "");
     setLocalMessage(card.message || "");
 
-    // Load avatar from localStorage if it exists
+    // Load avatar from card prop first (from Supabase), then fallback to localStorage
     if (card.pasted && card.id) {
-      const avatarMap = JSON.parse(
-        localStorage.getItem("ratingAvatars") || "{}"
-      );
-      if (avatarMap[card.id]) {
-        setAvatarUrl(avatarMap[card.id]);
+      if (card.avatarUrl) {
+        // Avatar is in the card data (from Supabase)
+        setAvatarUrl(card.avatarUrl);
+      } else {
+        // Fallback to localStorage for older data
+        const avatarMap = JSON.parse(
+          localStorage.getItem("ratingAvatars") || "{}"
+        );
+        if (avatarMap[card.id]) {
+          setAvatarUrl(avatarMap[card.id]);
+        }
       }
     }
-  }, [card.id, card.pasted]);
+  }, [card.id, card.pasted, card.avatarUrl]);
 
   // Animated border for pasted cards - same as Projects
   useEffect(() => {
@@ -265,7 +271,14 @@ export default function RatingCard({
     avatarMap[card.id] = randomAvatar;
     localStorage.setItem("ratingAvatars", JSON.stringify(avatarMap));
 
-    onUpdate({ ...card, pasted: true, avatarUrl: randomAvatar });
+    // Pass the updated card with avatar URL to parent
+    const updatedCardWithAvatar = {
+      ...card,
+      pasted: true,
+      avatarUrl: randomAvatar,
+    };
+    
+    onUpdate(updatedCardWithAvatar);
   };
 
   const handleDeleteClick = () => {
@@ -369,11 +382,11 @@ export default function RatingCard({
           />
           {isPasted && isOwnRating && (
             <button
-              disabled={true}
-              className="no-drag p-0.5 opacity-50 cursor-not-allowed"
-              title="Cannot delete submitted ratings"
+              onClick={handleDeleteClick}
+              className="no-drag p-0.5 hover:bg-red-100 rounded"
+              title="Delete your rating"
             >
-              <Trash2 size={12} className="text-gray-400" />
+              <Trash2 size={12} className="text-red-400" />
             </button>
           )}
           {!isPasted && (

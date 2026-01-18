@@ -102,7 +102,7 @@ export default function RatingsPage() {
           }),
           pasted: item.pasted || false,
           userId: item.user_id || null,
-          avatarUrl: null,
+          avatarUrl: item.avatar_url || null,
           createdAt: item.created_at,
         };
       });
@@ -240,7 +240,12 @@ export default function RatingsPage() {
           rating: updatedCard.rating,
           color: updatedCard.color,
           pasted: updatedCard.pasted,
+          avatar_url: updatedCard.avatarUrl || null,
+          user_id: userId,
         };
+        
+        console.log("Updated Card:", updatedCard);
+        console.log("Saving to Supabase:", payload);
         
         const { error } = await supabase.from("ratings").upsert(payload);
         
@@ -248,6 +253,7 @@ export default function RatingsPage() {
           console.error("Error saving rating:", error.message || error);
           throw error;
         }
+        console.log("Successfully saved to Supabase!");
         setUserHasRating(true);
       } catch (error) {
         console.error("Failed to save rating to Supabase:", error?.message || error);
@@ -260,12 +266,20 @@ export default function RatingsPage() {
   const deleteCard = async (id) => {
     const deletedCard = cards.find((c) => c.id === id);
 
-    // CRITICAL: Prevent deletion of pasted ratings
-    // Only allow deletion of unpasted (draft) cards
+    // Allow deletion ONLY if:
+    // 1. Card is pasted (submitted)
+    // 2. Card belongs to current user (userId matches)
     if (deletedCard?.pasted) {
-      playSound("error", 0.3);
-      console.warn("Attempted to delete pasted rating - blocked");
-      return;
+      // Check if user owns this rating
+      if (deletedCard?.userId !== userId) {
+        playSound("error", 0.3);
+        console.warn("Attempted to delete someone else's rating - blocked");
+        return;
+      }
+      // User can delete their own pasted rating
+    } else {
+      // Allow deletion of unpasted (draft) cards
+      playSound("click", 0.3);
     }
 
     playSound("click", 0.3);
@@ -280,8 +294,8 @@ export default function RatingsPage() {
       setUserHasRating(false);
     }
 
-    // Only delete unpasted cards from Supabase (they shouldn't be there anyway)
-    if (supabase && !deletedCard?.pasted) {
+    // Delete from Supabase (both pasted and unpasted)
+    if (supabase) {
       try {
         const { error } = await supabase.from("ratings").delete().eq("id", id);
         if (error) throw error;

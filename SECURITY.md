@@ -67,9 +67,10 @@ Validates:
 
 Protections:
 
-- **Prevents deletion of pasted ratings** - Returns 403 Forbidden if attempting to delete submitted ratings
-- Only allows deletion of unpasted (draft) cards
-- Checks database before allowing deletion
+- **Ownership verification** - Only allows deletion if user owns the rating
+- **Prevents deletion of others' ratings** - Returns 403 Forbidden if attempting to delete someone else's rating
+- Allows users to delete their own submitted ratings
+- Checks database to verify ownership before allowing deletion
 
 **Location**: `app/api/delete-rating/route.js`
 
@@ -87,16 +88,16 @@ Protections:
 - Validates all rating data before submission
 - Server-side verification of all ratings
 - **Prevents editing of pasted ratings** - Once a rating is submitted, it cannot be edited
-- **Prevents deletion of pasted ratings** - Submitted ratings cannot be deleted
-- Blocks any attempts to modify or delete already-pasted cards
+- **Allows users to delete only their own ratings** - Users can delete their own submitted ratings but not others'
+- Blocks any attempts to modify already-pasted cards or delete others' ratings
 
 ### RatingCard Component
 
 - Input fields are disabled (`disabled={isPasted}`) for pasted cards
 - Read-only state prevents any modifications
 - Stars and color selection disabled for pasted ratings
-- Delete button is disabled and grayed out for pasted ratings
-- Only unpasted (draft) cards can be deleted
+- Delete button is enabled only for own pasted ratings
+- Only unpasted (draft) cards and own pasted ratings can be deleted
 
 ## Important Notes
 
@@ -110,18 +111,18 @@ Protections:
 
 ## Supabase Database Safety
 
-The implementation ensures the Supabase database is **never corrupted** by edit attempts, duplicate submissions, or deletions:
+The implementation ensures the Supabase database is **never corrupted** by edit attempts, duplicate submissions, or unauthorized deletions:
 
 1. **UI-Level Prevention**:
 
    - Pasted cards have disabled inputs, preventing accidental edits
-   - Delete button is disabled and grayed out for pasted ratings
-   - Only unpasted (draft) cards can be deleted
+   - Delete button is enabled only for own pasted ratings
+   - Only unpasted (draft) cards and own pasted ratings can be deleted
 
 2. **Client-Side Logic**:
 
    - `updateCard()` checks if a card is already pasted and blocks updates
-   - `deleteCard()` checks if a card is pasted and blocks deletion
+   - `deleteCard()` checks ownership and blocks deletion of others' ratings
    - Prevents the same rating ID from being submitted twice
 
 3. **Duplicate Submission Prevention**:
@@ -133,15 +134,15 @@ The implementation ensures the Supabase database is **never corrupted** by edit 
 4. **Server-Side Enforcement**:
 
    - `/api/validate-rating` checks if rating ID already exists (409 Conflict)
-   - `/api/delete-rating` prevents deletion of pasted ratings (403 Forbidden)
-   - Rejects any duplicate submissions or deletions before they reach the database
-   - Only allows INSERT of new ratings, never UPDATE or DELETE of existing ones
+   - `/api/delete-rating` verifies ownership before allowing deletion (403 Forbidden for others' ratings)
+   - Rejects any duplicate submissions or unauthorized deletions before they reach the database
+   - Only allows INSERT of new ratings, never UPDATE of existing ones
 
 5. **Database Integrity**:
    - Only the initial submission (unpasted → pasted) writes to Supabase
    - Subsequent edit attempts are blocked before reaching the database
-   - Deletion attempts on pasted ratings are blocked at UI and API level
-   - The 253 existing ratings remain immutable and protected
+   - Deletion attempts on others' ratings are blocked at UI and API level
+   - Users can only delete their own submitted ratings
    - Duplicate submissions are rejected at the API level
 
 **Attack Scenarios Now Blocked:**
@@ -153,16 +154,22 @@ Scenario 1: Edit existing rating
 → API blocks (duplicate check)
 → Database never receives update
 
-Scenario 2: Delete existing rating
-→ UI blocks (delete button disabled)
-→ Client-side blocks (deleteCard check)
-→ API blocks (delete-rating endpoint check)
+Scenario 2: Delete someone else's rating
+→ UI blocks (delete button hidden for others' ratings)
+→ Client-side blocks (deleteCard ownership check)
+→ API blocks (403 Forbidden - ownership verification)
 → Database never receives delete request
 
 Scenario 3: Delete and resubmit
 → Client-side blocks (submittedRatingIds check)
 → API blocks (duplicate check)
 → Database never receives duplicate
+
+Scenario 4: Delete own rating
+→ UI allows (delete button visible for own ratings)
+→ Client-side allows (ownership verified)
+→ API allows (ownership verified)
+→ Database receives delete request only for own ratings
 ```
 
 **Flow:**
@@ -172,10 +179,11 @@ Scenario 3: Delete and resubmit
 - `updateCard()` detects transition from unpasted→pasted
 - Rating ID added to `submittedRatingIds` (permanent record)
 - Supabase INSERT happens only once
-- Any further edit attempts are blocked at UI and API level
-- Any deletion attempts are blocked at UI and API level
-- Any resubmission attempts are blocked by duplicate check
-- Database never receives update, delete, or duplicate requests
+- User can delete their own rating (UI shows delete button)
+- Other users cannot delete this rating (UI hides delete button)
+- Any edit attempts are blocked at UI and API level
+- Any unauthorized deletion attempts are blocked at UI and API level
+- Database never receives update or unauthorized delete requests
 
 ## Best Practices
 
