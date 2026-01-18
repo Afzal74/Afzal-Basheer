@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
 import { supabase } from "@/lib/supabase";
 import { playSound } from "./useSoundEffects";
+import { initializeSecurityMeasures, validateScoreData } from "@/lib/security";
 
 const FlappyBird = ({ onClose }) => {
   const canvasRef = useRef(null);
@@ -27,11 +28,11 @@ const FlappyBird = ({ onClose }) => {
     pipeSpeed: 2,
     frameId: null,
   });
-  
+
   const lastSoundTime = useRef(0);
 
   const pixelFont = { fontFamily: '"Press Start 2P", cursive' };
-  
+
   // Play sound with cooldown to prevent spam
   const playGameSound = (soundName, volume = 0.3, cooldown = 100) => {
     const now = Date.now();
@@ -43,14 +44,16 @@ const FlappyBird = ({ onClose }) => {
 
   // Load high score and leaderboard
   useEffect(() => {
+    initializeSecurityMeasures();
+
     const saved = localStorage.getItem("flappyHighScore");
     if (saved) setHighScore(parseInt(saved));
-    
+
     const savedUsername = localStorage.getItem("flappyUsername");
     if (savedUsername) {
       setUsername(savedUsername);
     }
-    
+
     fetchLeaderboard();
   }, []);
 
@@ -62,7 +65,7 @@ const FlappyBird = ({ onClose }) => {
         .select("username, score")
         .order("score", { ascending: false })
         .limit(5);
-      
+
       if (!error && data) {
         setLeaderboard(data);
       }
@@ -73,6 +76,12 @@ const FlappyBird = ({ onClose }) => {
 
   const submitScore = async (finalScore) => {
     if (!supabase || !username || isSubmitting) return;
+
+    // Validate score before submission
+    if (!validateScoreData(finalScore, { username })) {
+      console.warn("Invalid score data detected");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -218,14 +227,22 @@ const FlappyBird = ({ onClose }) => {
         ctx.strokeStyle = "#0f0f1a";
         ctx.lineWidth = 2;
         ctx.strokeRect(pipe.x, 0, game.pipeWidth, pipe.gapY);
-        
+
         // Top building windows
         const windowSize = 8;
         const windowGap = 12;
         const windowMargin = 6;
         ctx.fillStyle = "#fbbf24";
-        for (let wy = windowMargin; wy < pipe.gapY - windowSize; wy += windowGap) {
-          for (let wx = windowMargin; wx < game.pipeWidth - windowSize; wx += windowGap) {
+        for (
+          let wy = windowMargin;
+          wy < pipe.gapY - windowSize;
+          wy += windowGap
+        ) {
+          for (
+            let wx = windowMargin;
+            wx < game.pipeWidth - windowSize;
+            wx += windowGap
+          ) {
             // Randomly light some windows
             ctx.fillStyle = Math.random() > 0.3 ? "#fbbf24" : "#1f1f3a";
             ctx.fillRect(pipe.x + wx, wy, windowSize - 2, windowSize - 2);
@@ -238,13 +255,31 @@ const FlappyBird = ({ onClose }) => {
         const bottomPipeY = pipe.gapY + game.pipeGap;
         // Bottom building (pipe)
         ctx.fillStyle = "#1a1a2e";
-        ctx.fillRect(pipe.x, bottomPipeY, game.pipeWidth, canvas.height - bottomPipeY);
+        ctx.fillRect(
+          pipe.x,
+          bottomPipeY,
+          game.pipeWidth,
+          canvas.height - bottomPipeY
+        );
         ctx.strokeStyle = "#0f0f1a";
-        ctx.strokeRect(pipe.x, bottomPipeY, game.pipeWidth, canvas.height - bottomPipeY);
-        
+        ctx.strokeRect(
+          pipe.x,
+          bottomPipeY,
+          game.pipeWidth,
+          canvas.height - bottomPipeY
+        );
+
         // Bottom building windows
-        for (let wy = bottomPipeY + windowMargin + 8; wy < canvas.height - windowSize; wy += windowGap) {
-          for (let wx = windowMargin; wx < game.pipeWidth - windowSize; wx += windowGap) {
+        for (
+          let wy = bottomPipeY + windowMargin + 8;
+          wy < canvas.height - windowSize;
+          wy += windowGap
+        ) {
+          for (
+            let wx = windowMargin;
+            wx < game.pipeWidth - windowSize;
+            wx += windowGap
+          ) {
             ctx.fillStyle = Math.random() > 0.3 ? "#fbbf24" : "#1f1f3a";
             ctx.fillRect(pipe.x + wx, wy, windowSize - 2, windowSize - 2);
           }
@@ -340,7 +375,11 @@ const FlappyBird = ({ onClose }) => {
       ctx.fillText("GET READY!", canvas.width / 2, 80);
       ctx.fillStyle = "#fff";
       ctx.font = "48px 'Press Start 2P', monospace";
-      ctx.fillText(countdown.toString(), canvas.width / 2, canvas.height / 2 + 20);
+      ctx.fillText(
+        countdown.toString(),
+        canvas.width / 2,
+        canvas.height / 2 + 20
+      );
     } else if (gameState === "ready") {
       ctx.fillText("FLAPPY BIRD", canvas.width / 2, 50);
       ctx.fillStyle = "#666";
@@ -348,14 +387,22 @@ const FlappyBird = ({ onClose }) => {
       ctx.fillText("CLICK OR SPACE", canvas.width / 2, canvas.height / 2 + 20);
       ctx.fillText("TO START", canvas.width / 2, canvas.height / 2 + 35);
       ctx.fillStyle = "#fbbf24";
-      ctx.fillText(`PLAYER: ${username}`, canvas.width / 2, canvas.height / 2 + 60);
+      ctx.fillText(
+        `PLAYER: ${username}`,
+        canvas.width / 2,
+        canvas.height / 2 + 60
+      );
     } else if (gameState === "gameover") {
       ctx.fillText("GAME OVER", canvas.width / 2, 50);
       ctx.fillStyle = "#fff";
       ctx.font = "10px 'Press Start 2P', monospace";
       ctx.fillText(`SCORE: ${score}`, canvas.width / 2, canvas.height / 2 + 15);
       ctx.fillStyle = "#fbbf24";
-      ctx.fillText(`BEST: ${highScore}`, canvas.width / 2, canvas.height / 2 + 35);
+      ctx.fillText(
+        `BEST: ${highScore}`,
+        canvas.width / 2,
+        canvas.height / 2 + 35
+      );
       ctx.fillStyle = "#666";
       ctx.font = "7px 'Press Start 2P', monospace";
       ctx.fillText("CLICK TO RETRY", canvas.width / 2, canvas.height / 2 + 60);
@@ -395,8 +442,11 @@ const FlappyBird = ({ onClose }) => {
 
   const birdStyle =
     gameState === "playing"
-      ? { left: `${(birdPos.x / 300) * 100}%`, top: `${(birdPos.y / 300) * 100}%` }
-    : { left: '50%', top: '45%', transform: 'translate(-50%, -50%)' };
+      ? {
+          left: `${(birdPos.x / 300) * 100}%`,
+          top: `${(birdPos.y / 300) * 100}%`,
+        }
+      : { left: "50%", top: "45%", transform: "translate(-50%, -50%)" };
 
   // Username input screen
   if (gameState === "username") {
@@ -407,19 +457,40 @@ const FlappyBird = ({ onClose }) => {
             onClick={onClose}
             className="absolute top-2 right-2 text-zinc-500 hover:text-red-500 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
 
           <div className="text-center mb-6">
-            <img src="/Flappy bird/Bird.gif" alt="Flappy Bird" className="w-16 h-16 mx-auto mb-3" />
-            <h3 style={pixelFont} className="text-red-500 text-sm">FLAPPY BIRD</h3>
+            <img
+              src="/Flappy bird/Bird.gif"
+              alt="Flappy Bird"
+              className="w-16 h-16 mx-auto mb-3"
+            />
+            <h3 style={pixelFont} className="text-red-500 text-sm">
+              FLAPPY BIRD
+            </h3>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label style={pixelFont} className="text-zinc-400 text-[8px] block mb-2">ENTER YOUR NAME</label>
+              <label
+                style={pixelFont}
+                className="text-zinc-400 text-[8px] block mb-2"
+              >
+                ENTER YOUR NAME
+              </label>
               <input
                 type="text"
                 value={username}
@@ -451,22 +522,41 @@ const FlappyBird = ({ onClose }) => {
 
             {showLeaderboard && (
               <div className="bg-black border border-zinc-800 rounded p-3">
-                <h4 style={pixelFont} className="text-red-500 text-[8px] mb-3 text-center">TOP 5 SCORES</h4>
+                <h4
+                  style={pixelFont}
+                  className="text-red-500 text-[8px] mb-3 text-center"
+                >
+                  TOP 5 SCORES
+                </h4>
                 {leaderboard.length > 0 ? (
                   <div className="space-y-2">
                     {leaderboard.map((entry, i) => (
-                      <div key={i} className="flex justify-between items-center">
-                        <span style={pixelFont} className="text-[7px] text-zinc-400">
+                      <div
+                        key={i}
+                        className="flex justify-between items-center"
+                      >
+                        <span
+                          style={pixelFont}
+                          className="text-[7px] text-zinc-400"
+                        >
                           {i + 1}. {entry.username}
                         </span>
-                        <span style={pixelFont} className="text-[8px] text-yellow-500">
+                        <span
+                          style={pixelFont}
+                          className="text-[8px] text-yellow-500"
+                        >
                           {entry.score}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p style={pixelFont} className="text-zinc-600 text-[7px] text-center">No scores yet!</p>
+                  <p
+                    style={pixelFont}
+                    className="text-zinc-600 text-[7px] text-center"
+                  >
+                    No scores yet!
+                  </p>
                 )}
               </div>
             )}
@@ -486,20 +576,36 @@ const FlappyBird = ({ onClose }) => {
           <div className="game-border-bottom absolute bottom-0 right-[-100%] w-full h-[3px] bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
           <div className="game-border-left absolute bottom-[-100%] left-0 w-[3px] h-full bg-gradient-to-b from-transparent via-red-500 to-transparent shadow-[0_0_15px_rgba(239,68,68,0.8)]" />
         </div>
-        
+
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-zinc-500 hover:text-red-500 transition-colors z-10"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         <div className="text-center mb-3">
           <div className="flex items-center justify-center gap-2">
-            <img src="/Flappy bird/Bird.gif" alt="Flappy Bird" className="w-8 h-8" />
-            <h3 style={pixelFont} className="text-red-500 text-xs">FLAPPY BIRD</h3>
+            <img
+              src="/Flappy bird/Bird.gif"
+              alt="Flappy Bird"
+              className="w-8 h-8"
+            />
+            <h3 style={pixelFont} className="text-red-500 text-xs">
+              FLAPPY BIRD
+            </h3>
           </div>
         </div>
 
@@ -535,22 +641,38 @@ const FlappyBird = ({ onClose }) => {
 
         {showLeaderboard && (
           <div className="mt-3 bg-black border border-zinc-800 rounded p-3">
-            <h4 style={pixelFont} className="text-red-500 text-[8px] mb-3 text-center">TOP 5 SCORES</h4>
+            <h4
+              style={pixelFont}
+              className="text-red-500 text-[8px] mb-3 text-center"
+            >
+              TOP 5 SCORES
+            </h4>
             {leaderboard.length > 0 ? (
               <div className="space-y-2">
                 {leaderboard.map((entry, i) => (
                   <div key={i} className="flex justify-between items-center">
-                    <span style={pixelFont} className="text-[7px] text-zinc-400">
+                    <span
+                      style={pixelFont}
+                      className="text-[7px] text-zinc-400"
+                    >
                       {i + 1}. {entry.username}
                     </span>
-                    <span style={pixelFont} className="text-[8px] text-yellow-500">
+                    <span
+                      style={pixelFont}
+                      className="text-[8px] text-yellow-500"
+                    >
                       {entry.score}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={pixelFont} className="text-zinc-600 text-[7px] text-center">No scores yet!</p>
+              <p
+                style={pixelFont}
+                className="text-zinc-600 text-[7px] text-center"
+              >
+                No scores yet!
+              </p>
             )}
           </div>
         )}

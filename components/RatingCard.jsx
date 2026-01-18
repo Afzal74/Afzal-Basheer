@@ -369,10 +369,11 @@ export default function RatingCard({
           />
           {isPasted && isOwnRating && (
             <button
-              onClick={handleDeleteClick}
-              className="no-drag p-0.5 hover:bg-red-100 rounded"
+              disabled={true}
+              className="no-drag p-0.5 opacity-50 cursor-not-allowed"
+              title="Cannot delete submitted ratings"
             >
-              <Trash2 size={12} className="text-red-400" />
+              <Trash2 size={12} className="text-gray-400" />
             </button>
           )}
           {!isPasted && (
@@ -434,7 +435,10 @@ export default function RatingCard({
               onBlur={() => setNameFocused(false)}
               placeholder={nameError ? "Name required!" : "Your name..."}
               readOnly={isPasted}
+              disabled={isPasted}
               className={`no-drag flex-1 bg-transparent border-none outline-none text-sm sm:text-base font-bold placeholder:font-normal cursor-text cursor-blink ${
+                isPasted ? "opacity-100 cursor-default" : ""
+              } ${
                 nameError
                   ? "text-red-500 placeholder:text-red-400"
                   : "text-gray-800 placeholder:text-gray-400"
@@ -458,6 +462,7 @@ export default function RatingCard({
               placeholder="Message..."
               maxLength={100}
               readOnly={isPasted}
+              disabled={isPasted}
               className={`no-drag w-full bg-transparent border-none outline-none text-gray-700 text-[10px] sm:text-sm placeholder:text-gray-500 mt-0.5 cursor-text font-medium cursor-blink`}
               style={{ fontFamily: "'Caveat', cursive" }}
             />

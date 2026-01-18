@@ -7,6 +7,7 @@ import RatingCard from "@/components/RatingCard";
 import SoundLink from "@/components/SoundLink";
 import { playSound } from "@/components/useSoundEffects";
 import { supabase } from "@/lib/supabase";
+import { initializeSecurityMeasures } from "@/lib/security";
 
 const pixelFont = { fontFamily: '"Press Start 2P", cursive' };
 const appleFont = {
@@ -46,6 +47,7 @@ export default function RatingsPage() {
   // Load cards from Supabase
   useEffect(() => {
     setMounted(true);
+    initializeSecurityMeasures();
     if (userId) {
       loadCards();
     }
@@ -198,19 +200,38 @@ export default function RatingsPage() {
   };
 
   const updateCard = async (updatedCard) => {
+    // Prevent editing of pasted cards - block at UI level
+    const existingCard = cards.find(c => c.id === updatedCard.id);
+    if (existingCard?.pasted && updatedCard.pasted) {
+      playSound("error", 0.3);
+      return;
+    }
+
     setCards((prev) =>
       prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
     );
 
-    // Save to Supabase when card is pasted
-    if (updatedCard.pasted && supabase) {
+    // Save to Supabase ONLY when card transitions from unpasted to pasted (first submission)
+    if (updatedCard.pasted && !existingCard?.pasted && supabase) {
       try {
+        // Check if this rating ID was already submitted before (prevent resubmission)
+        const submittedRatings = JSON.parse(localStorage.getItem("submittedRatingIds") || "[]");
+        if (submittedRatings.includes(updatedCard.id)) {
+          playSound("error", 0.3);
+          console.warn("Attempted to resubmit already submitted rating");
+          return;
+        }
+
         // Track this rating as belonging to current user
         const userRatingIds = JSON.parse(localStorage.getItem("userRatingIds") || "[]");
         if (!userRatingIds.includes(updatedCard.id)) {
           userRatingIds.push(updatedCard.id);
           localStorage.setItem("userRatingIds", JSON.stringify(userRatingIds));
         }
+
+        // Mark this rating as submitted (permanent record)
+        submittedRatings.push(updatedCard.id);
+        localStorage.setItem("submittedRatingIds", JSON.stringify(submittedRatings));
 
         const payload = {
           id: updatedCard.id,
@@ -237,8 +258,17 @@ export default function RatingsPage() {
   };
 
   const deleteCard = async (id) => {
-    playSound("click", 0.3);
     const deletedCard = cards.find((c) => c.id === id);
+
+    // CRITICAL: Prevent deletion of pasted ratings
+    // Only allow deletion of unpasted (draft) cards
+    if (deletedCard?.pasted) {
+      playSound("error", 0.3);
+      console.warn("Attempted to delete pasted rating - blocked");
+      return;
+    }
+
+    playSound("click", 0.3);
     setCards((prev) => prev.filter((card) => card.id !== id));
 
     // Remove from user's rating list
@@ -250,8 +280,8 @@ export default function RatingsPage() {
       setUserHasRating(false);
     }
 
-    // Delete from Supabase
-    if (supabase) {
+    // Only delete unpasted cards from Supabase (they shouldn't be there anyway)
+    if (supabase && !deletedCard?.pasted) {
       try {
         const { error } = await supabase.from("ratings").delete().eq("id", id);
         if (error) throw error;
