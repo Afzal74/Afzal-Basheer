@@ -85,6 +85,19 @@ const FlappyBird = ({ onClose }) => {
 
     setIsSubmitting(true);
     try {
+      // Call server-side validation API
+      const validationResponse = await fetch("/api/validate-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, score: finalScore }),
+      });
+
+      if (!validationResponse.ok) {
+        console.warn("Score validation failed on server");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Check if user already has a score
       const { data: existing } = await supabase
         .from("flappy_scores")
@@ -108,8 +121,9 @@ const FlappyBird = ({ onClose }) => {
         });
       }
       await fetchLeaderboard();
-    } catch (err) {
-      console.error("Error submitting score:", err);
+      console.log("Score submitted successfully:", finalScore);
+    } catch (error) {
+      console.error("Error submitting score:", error);
     }
     setIsSubmitting(false);
   };

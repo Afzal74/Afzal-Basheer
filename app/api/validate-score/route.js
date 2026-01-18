@@ -14,8 +14,9 @@ export async function POST(request) {
 
     // Validate score is reasonable (Flappy Bird max ~999)
     if (score < 0 || score > 999 || !Number.isInteger(score)) {
+      console.warn(`Invalid score attempt: ${score} by ${username}`);
       return new Response(
-        JSON.stringify({ error: "Invalid score" }),
+        JSON.stringify({ error: "Invalid score - out of range" }),
         { status: 400 }
       );
     }
@@ -30,22 +31,29 @@ export async function POST(request) {
 
     // Check if score is suspiciously high compared to existing scores
     if (supabase) {
-      const { data: topScores } = await supabase
-        .from("flappy_scores")
-        .select("score")
-        .order("score", { ascending: false })
-        .limit(10);
+      try {
+        const { data: topScores } = await supabase
+          .from("flappy_scores")
+          .select("score")
+          .order("score", { ascending: false })
+          .limit(10);
 
-      if (topScores && topScores.length > 0) {
-        const avgTopScore =
-          topScores.reduce((sum, s) => sum + s.score, 0) / topScores.length;
-        // Flag if score is more than 5x the average (potential cheat)
-        if (score > avgTopScore * 5) {
-          return new Response(
-            JSON.stringify({ error: "Score validation failed" }),
-            { status: 400 }
-          );
+        if (topScores && topScores.length > 0) {
+          const maxScore = Math.max(...topScores.map(s => s.score));
+          
+          // Only reject if score is IMPOSSIBLY high (more than 10x the max)
+          // This allows legitimate high scores while blocking obvious cheats
+          if (score > maxScore * 10 && maxScore > 0) {
+            console.warn(`Impossible score: ${score} vs max ${maxScore} by ${username}`);
+            return new Response(
+              JSON.stringify({ error: "Score impossibly high" }),
+              { status: 400 }
+            );
+          }
         }
+      } catch (dbError) {
+        console.error("Database error during validation:", dbError);
+        // Continue with validation even if DB check fails
       }
     }
 
